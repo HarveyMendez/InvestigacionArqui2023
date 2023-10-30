@@ -7,6 +7,8 @@ package GUI;
 import Domain.Game;
 import com.panamahitek.ArduinoException;
 import com.panamahitek.PanamaHitek_Arduino;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.ImageIcon;
@@ -22,15 +24,18 @@ import jssc.SerialPortException;
 public class GameWindow extends javax.swing.JFrame{
     
     PanamaHitek_Arduino arduino;
-     String messageArduino="";
+    String messageArduino="";
+    Game game;
+    
     
     public GameWindow(){
-        Game newGame = new Game(3, 3);
+       
         setSize(815, 745);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLayout(null);
         arduino = new PanamaHitek_Arduino();
+        game = new Game(3, 3);
         try {
             arduino.arduinoRX("COM3", 9600, listener);
         } catch (ArduinoException ex) {
@@ -42,7 +47,24 @@ public class GameWindow extends javax.swing.JFrame{
         
     }
 
+    
+//    ImageIcon imgEnemy = new ImageIcon(getClass().getResource("/img/FrostmageGame.png"));
+//    JLabel enemyLabel = new JLabel(imgEnemy);
+    
+    
+    public  ImageIcon imgSelection = new ImageIcon(getClass().getResource("/img/Selection.png"));
+    public  JLabel selection = new JLabel(imgSelection);
+    
     public void init(){
+        
+//        int x = 600; // reemplaza con la coordenada X deseada
+//        int y = 540; // reemplaza con la coordenada Y deseada
+//        enemyLabel.setBounds(x, y,imgEnemy.getIconWidth(),imgEnemy.getIconHeight());
+//        this.add(enemyLabel);
+        
+        
+        selection.setBounds(425 , 590, 100, 100);
+        this.add(selection);
         
         //Tipós de Unidades
         ImageIcon imgKnight = new ImageIcon(getClass().getResource("/img/knightpeque.png"));
@@ -60,9 +82,6 @@ public class GameWindow extends javax.swing.JFrame{
         crossBow.setBounds(610, 600, 100, 100);
         this.add(crossBow);
         
-        
-        
-        
         //Mapa y hub
         ImageIcon imgHub = new ImageIcon(getClass().getResource("/img/Hud1.png"));
         JLabel hub = new JLabel(imgHub);
@@ -74,6 +93,10 @@ public class GameWindow extends javax.swing.JFrame{
         JLabel map = new JLabel(imgMap);
         map.setBounds(0, 0, 800, 600);
         this.add(map);
+        
+        
+        
+        
     }
     
    
@@ -91,52 +114,67 @@ public class GameWindow extends javax.swing.JFrame{
                          //JOptionPane.showMessageDialog(null, arduino.printMessage(), "Información", JOptionPane.INFORMATION_MESSAGE);
                             if (messageArduino.equals("Boton DERECHA presionado")) {
                                 System.out.println("Derecha");
+                                int position= game.Selection(selection, "DERECHA");
+                                selection.setBounds(position , 590, 100, 100);
+//                                ImageIcon imagen = new ImageIcon(getClass().getResource("/img/knightGame.png"));
+//                                JLabel label = new JLabel(imagen);
+//
+//                                JLayeredPane layeredPane = getLayeredPane();
+//                                layeredPane.add(label, JLayeredPane.DEFAULT_LAYER);
+//                                    // Establecer las coordenadas específicas (x, y) donde quieres mostrar el JLabel
+//                                int x = 120; // reemplaza con la coordenada X deseada
+//                                int y = 540; // reemplaza con la coordenada Y deseada
+//                                label.setBounds(x, y, imagen.getIconWidth(), imagen.getIconHeight());
+//                                game.movementBotlane(label, 745, 0,true);
+//                                setVisible(true);
+                            }
+                        
+                            if(messageArduino.equals("Boton ARRIBA presionado")){
+                                System.out.println("Arriba");
                                 ImageIcon imagen = new ImageIcon(getClass().getResource("/img/knightGame.png"));
                                 JLabel label = new JLabel(imagen);
 
                                 JLayeredPane layeredPane = getLayeredPane();
                                 layeredPane.add(label, JLayeredPane.DEFAULT_LAYER);
                                     // Establecer las coordenadas específicas (x, y) donde quieres mostrar el JLabel
-                                int x = 120; // reemplaza con la coordenada X deseada
+                                int x = 10; // reemplaza con la coordenada X deseada
+                                int y = 440; // reemplaza con la coordenada Y deseada
+                                label.setBounds(x, y, imagen.getIconWidth(), imagen.getIconHeight());
+                                game.movementToplane(label, 745, 10,true);
+                                setVisible(true);
+                            }
+
+                            if (messageArduino.equals("Boton ABAJO presionado")) {
+                                System.out.println("Abajo");
+                                ImageIcon imagen = new ImageIcon(getClass().getResource("/img/knightGame.png"));
+                                JLabel label = new JLabel(imagen);
+
+                                JLayeredPane layeredPane = getLayeredPane();
+                                layeredPane.add(label, JLayeredPane.DEFAULT_LAYER);
+                                // Establecer las coordenadas específicas (x, y) donde quieres mostrar el JLabel
+                                int x = 110; // reemplaza con la coordenada X deseada
                                 int y = 540; // reemplaza con la coordenada Y deseada
                                 label.setBounds(x, y, imagen.getIconWidth(), imagen.getIconHeight());
-                                setVisible(true);
-                            }
-                        
-                            if(messageArduino.equals("Boton ARRIBA presionado")){
-                                System.out.println("Arriba");
-                                ImageIcon imagen = new ImageIcon(getClass().getResource("/img/crossbow.png"));
-                                JLabel label = new JLabel(imagen);
 
-                                JLayeredPane layeredPane = getLayeredPane();
-                                layeredPane.add(label, JLayeredPane.DEFAULT_LAYER);
-                                label.setBounds(0, 0, imagen.getIconWidth(), imagen.getIconHeight());
+                                ActionListener collisionListener = new ActionListener() {
+                                    @Override
+                                    public void actionPerformed(ActionEvent e) {
+                                        System.out.println("Colisión detectada, ¡iniciar pelea!");
+                                        // Haz algo aquí cuando se detecte una colisión (por ejemplo, iniciar una pelea)
+                                    }
+                                };
 
-                                setVisible(true);
-                            }
-
-                            if(messageArduino.equals("Boton ABAJO presionado")){
-                                System.out.println("Abajo");
-                                ImageIcon imagen = new ImageIcon(getClass().getResource("/img/crossbowpeque.png"));
-                                JLabel label = new JLabel(imagen);
-
-                                JLayeredPane layeredPane = getLayeredPane();
-                                layeredPane.add(label, JLayeredPane.DEFAULT_LAYER);
-                                label.setBounds(0, 0, imagen.getIconWidth(), imagen.getIconHeight());
+                                game.movementBotlane(label, 745, 10, true);
 
                                 setVisible(true);
                             }
+
 
                             if(messageArduino.equals("Boton IZQUIERDA presionado")){
                                 System.out.println("Izquierda");
-                                ImageIcon imagen = new ImageIcon(getClass().getResource("/img/horsepeque.png"));
-                                JLabel label = new JLabel(imagen);
-
-                                JLayeredPane layeredPane = getLayeredPane();
-                                layeredPane.add(label, JLayeredPane.DEFAULT_LAYER);
-                                label.setBounds(0, 0, imagen.getIconWidth(), imagen.getIconHeight());
-
-                                setVisible(true);
+                                int position= game.Selection(selection, "IZQUIERDA");
+                                selection.setBounds(position , 590, 100, 100);
+//                                
                             }
                             
                          }
