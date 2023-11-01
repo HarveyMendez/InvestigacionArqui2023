@@ -28,7 +28,12 @@ public class Game{
     private int tower2;
     public int finish = 0;
     public int Selection;
-    
+
+    public int stop;
+    Timer timer;
+
+    public int win;
+
     
 
     public int getSelection() {
@@ -107,7 +112,7 @@ public class Game{
    public ImageIcon icon2 = new ImageIcon();
    public String playerUnitName;
    public String enemyUnitName;
-    public boolean checkCollision(JLabel label1, JLabel label2) {
+   public boolean checkCollision(JLabel label1, JLabel label2) {
         
         Rectangle rectLabel1 = label1.getBounds();
         Rectangle rectLabel2 = label2.getBounds();
@@ -139,7 +144,7 @@ public class Game{
         return rectLabel1.intersects(rectLabel2);
     }
     
-    public int win;
+
     public String encounterWinner(){
        String unit2=playerUnitName;
        String unit1=enemyUnitName;
@@ -215,8 +220,7 @@ public class Game{
         
     }
     
-    public int stop;
-    Timer timer;
+
    
     public void movementBotlane(JLabel label, int x, int y) {
     System.out.println("VOY POR BOT");

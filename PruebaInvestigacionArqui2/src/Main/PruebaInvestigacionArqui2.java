@@ -19,7 +19,7 @@ public class PruebaInvestigacionArqui2 {
     public static void main(String[] args) {
         GameWindow mw = new GameWindow();
         
-        mw.setVisible(true);
+        mw.setVisible(true);      
     }
     
 }

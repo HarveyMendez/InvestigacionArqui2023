@@ -12,17 +12,16 @@ import javax.swing.JLabel;
  * @author jodas
  */
 public class Unit {
+    
     private JLabel label;
     private String unitName;
     private int type;
     private ImageIcon image;
 
-    public ImageIcon getImage() {
-        return image;
-    }
-
-    public void setImage(ImageIcon image) {
-        this.image = image;
+    public Unit(JLabel label, String unitName, int type) {
+        this.label = label;
+        this.unitName = unitName;
+        this.type = type;
     }
 
     public Unit(JLabel label, String unitName, int type, ImageIcon image) {
@@ -32,10 +31,12 @@ public class Unit {
         this.image = image;
     }
 
-    public Unit(JLabel label, String unitName, int type) {
-        this.label = label;
-        this.unitName = unitName;
-        this.type = type;
+    public ImageIcon getImage() {
+        return image;
+    }
+
+    public void setImage(ImageIcon image) {
+        this.image = image;
     }
 
     public JLabel getLabel() {
