@@ -108,9 +108,10 @@ public class Game{
    public String playerUnitName;
    public String enemyUnitName;
     public boolean checkCollision(JLabel label1, JLabel label2) {
-        
         Rectangle rectLabel1 = label1.getBounds();
-        Rectangle rectLabel2 = label2.getBounds();
+            Rectangle rectLabel2 = label2.getBounds();
+        if(label1.isVisible() && label2.isVisible()){
+            
         
         icon1 = (ImageIcon) label1.getIcon();
         icon2 = (ImageIcon) label2.getIcon();
@@ -133,6 +134,9 @@ public class Game{
         if(icon2.toString().equalsIgnoreCase("file:/C:/Users/jodas/OneDrive/Desktop/InvestigacionArqui2023/PruebaInvestigacionArqui2/build/classes/img/UNITS/UNITS1/crossbowGameEnemy.png")){
             enemyUnitName="crossBow";
         }
+        }
+        
+        
         
         
         

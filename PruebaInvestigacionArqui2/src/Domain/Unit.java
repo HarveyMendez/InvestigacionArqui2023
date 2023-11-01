@@ -17,6 +17,10 @@ public class Unit {
     private int type;
     private ImageIcon image;
 
+    public Unit() {
+        
+    }
+
     public ImageIcon getImage() {
         return image;
     }

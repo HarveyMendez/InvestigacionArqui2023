@@ -40,6 +40,7 @@ public class GameWindow extends javax.swing.JFrame{
     private Timer collisionTimer; 
     
     public ArrayList<Unit> unitList = new ArrayList<>();
+    public ArrayList<Unit> enemyUnitList = new ArrayList<>();
 
      
      
@@ -114,8 +115,8 @@ private final Object pauseLock = new Object();
     
     ImageIcon imgEnemy = new ImageIcon(getClass().getResource("/img/UNITS/UNITS1/knightGameEnemy.png"));
     public JLabel enemyLabel = new JLabel(imgEnemy);
-    
-    
+    public Unit enemyUnit = new Unit();
+   
     public  ImageIcon imgSelection = new ImageIcon(getClass().getResource("/img/HUD/HUD1/Selection.png"));
     public  JLabel selection = new JLabel(imgSelection);
     
@@ -128,9 +129,17 @@ private final Object pauseLock = new Object();
         enemyLabel.setBounds(x, y,imgEnemy.getIconWidth(),imgEnemy.getIconHeight());
         Border border = new LineBorder(Color.BLACK, 2);
         enemyLabel.setBorder(border);
-        this.add(enemyLabel);
+        enemyUnit = new Unit(enemyLabel, SelectedUnit, 1);
+         
+                                
+                                 // Agregar JLabel al ArrayList
+                                enemyUnitList.add(enemyUnit);
+        
+        this.add(enemyUnit.getLabel());
                 selection.setBounds(425 , 590, 100, 100);
                 
+                                
+                                
                 JLabel fake = new JLabel();
                 fake.setBounds(170 , 590, 100, 100);
                 game.Selection(fake, messageArduino);
@@ -241,18 +250,24 @@ private final Object pauseLock = new Object();
                                 
                                 
                                 
-                                // Agregar JLabel al ArrayList
-                                //unitList.add(label);
+                               
                                 
                                 ImageIcon imagen = new ImageIcon();
                                 SelectedUnit = game.UnitSelected(game.getSelection());
                                 imagen = game.getImageIcon(SelectedUnit);
                                 
-                                final JLabel  label = new JLabel(imagen);
+                                JLabel  label = new JLabel(imagen);
                                 
+                                // TODO 
+                                // manejar los tipos, si es 1 MEDIEVAL, SI ES 2 MAGIA, SI ES 3 MINIONS
+                                
+                                Unit unit = new Unit(label, SelectedUnit, 1);
+                                
+                                 // Agregar JLabel al ArrayList
+                                unitList.add(unit);
 
                                 JLayeredPane layeredPane = getLayeredPane();
-                                layeredPane.add(label, JLayeredPane.DEFAULT_LAYER);
+                                layeredPane.add(unit.getLabel(), JLayeredPane.DEFAULT_LAYER);
                                 
                                 
                                 // Establecer las coordenadas específicas (x, y) donde quieres mostrar el JLabel
@@ -282,28 +297,30 @@ private final Object pauseLock = new Object();
                                            // System.out.println("GANADOR DEL ENCUENTRO: "+game.encounterWinner()+" Numero: "+winner);
                                             switch(winner) {
                                                 case 0:
-                                                    label.setVisible(false);
+//                                                    label.setVisible(false);
                                                     enemyLabel.setVisible(false);
-                                                    layeredPane.remove(label);
-                                                    layeredPane.remove(enemyLabel);
+                                                    layeredPane.remove(unit.getLabel());
+                                                    layeredPane.remove(enemyUnit.getLabel());
+                                                    
                                                     // Eliminar JLabel del ArrayList y del JLayeredPane
-//                                                    unitList.remove(label);
-//                                                    unitList.remove(enemyLabel);
-//                                                    unitList.revalidate();
-//                                                    unitList.repaint();
+                                                    unitList.remove(unit);
+                                                    enemyUnitList.remove(enemyUnit);
+                                                    
                                                    
                                                     break;
                                                 case 2:
                                                     enemyLabel.setVisible(false);
                                                     layeredPane.remove(enemyLabel);
-//                                                    unitList.remove(enemyLabel);
+                                                    layeredPane.remove(enemyUnit.getLabel());
+                                                    enemyUnitList.remove(enemyUnit);
                                                     
                                                     
                                                     break;
                                                 case 1:
                                                     label.setVisible(false);
                                                     layeredPane.remove(label);
-//                                                    unitList.remove(label);
+                                                    layeredPane.remove(unit.getLabel());
+                                                    unitList.remove(unit);
                                                     break;
                                             }
                                             //game.stop=1;
@@ -311,6 +328,7 @@ private final Object pauseLock = new Object();
                                             repaint();        
                                             collisionTimer.stop();
                                             collisionTimer = null;
+                                            System.gc();
                                            //  JOptionPane.showMessageDialog(null, "GANADOR DEL ENCUENTRO: "+game.encounterWinner()+" Numero: "+winner, "Información", JOptionPane.INFORMATION_MESSAGE);
                                         } else {
                                             game.stop=0;
