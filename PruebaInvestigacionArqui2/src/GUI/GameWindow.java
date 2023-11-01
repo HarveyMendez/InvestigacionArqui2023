@@ -327,7 +327,7 @@ private final Object pauseLock = new Object();
                                             revalidate();
                                             repaint();        
                                             collisionTimer.stop();
-                                            collisionTimer = null;
+                                            
                                             System.gc();
                                            //  JOptionPane.showMessageDialog(null, "GANADOR DEL ENCUENTRO: "+game.encounterWinner()+" Numero: "+winner, "Información", JOptionPane.INFORMATION_MESSAGE);
                                         } else {
