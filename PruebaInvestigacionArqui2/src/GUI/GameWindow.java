@@ -209,10 +209,7 @@ public class GameWindow extends javax.swing.JFrame{
         int y = 440; 
         label.setBounds(x, y, imagen.getIconWidth(), imagen.getIconHeight());
                                         
-        // PROBAR COLISIONES
-        Border border = new LineBorder(Color.BLACK, 2);
-        label.setBorder(border);
-        // -----------------------------------------
+        
                                 
         game.movementToplane(label, 745, 10);
         unit.setCollisionTimer(collisionTimer);

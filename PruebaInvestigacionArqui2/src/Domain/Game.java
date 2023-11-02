@@ -225,14 +225,14 @@ public class Game{
                 
               // PRIMERO SE MUEVE EN X
             if (posX < x && label.isVisible()) {
-                posX+=5;
+                posX++;
             } else if (posX > x) {
                 posX--;
             }
             
             // LUEGO EN Y
             if (posY < y && posX == x && label.isVisible()) {
-                posY+=10;
+                posY++;
             } else if (posY > y && posX == x) {
                 posY--;
             }
@@ -284,7 +284,7 @@ public class Game{
 
             // LUEGO EN X
             if (posX < x && posY == y && label.isVisible()){
-                posX+=5;
+                posX++;
             } else if (posX > x && posY == y) {
                 posX--;
             }
