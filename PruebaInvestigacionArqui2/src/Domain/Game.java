@@ -35,23 +35,12 @@ public class Game{
         return Selection;
     }
     
-            
-            
-        
     
     public Game(int tower1, int tower2, PanamaHitek_Arduino arduino) {
-        
         this.tower1 = tower1;
         this.tower2 = tower2;
-        this.arduino = arduino;
-        
-        
-        
+        this.arduino = arduino; 
     }
-    
-
-    
-
     
     
     public int Selection(JLabel label, String msgArduino) {
@@ -134,37 +123,32 @@ public class Game{
         if(icon2.toString().equalsIgnoreCase("file:/C:/Users/jodas/OneDrive/Desktop/InvestigacionArqui2023/PruebaInvestigacionArqui2/build/classes/img/UNITS/UNITS1/crossbowGameEnemy.png")){
             enemyUnitName="crossBow";
         }
-        }
-        
-        
-        
-        
-        
         return rectLabel1.intersects(rectLabel2);
+        }else{
+            return false; 
+        }
+//        return rectLabel1.intersects(rectLabel2);
     }
     
     public int win;
-    public String encounterWinner(){
-       String unit2=playerUnitName;
-       String unit1=enemyUnitName;
-       
-        if (unit1.equals(unit2)) {
-            win=0;
-            return "empate";
-        } else if (
-            (unit1.equals("horse") && unit2.equals("knight")) ||
-            (unit1.equals("crossBow") && unit2.equals("horse")) ||
-            (unit1.equals("knight") && unit2.equals("crossBow"))
-        ) {
-            win=2;
-            return unit2;// Enemiga
-        } else {
-            win=1;
-            return unit1;// Aliada
-        }
-        
-    } 
+ public String encounterWinner() {
+    String unit2 = playerUnitName;
+    String unit1 = enemyUnitName;
     
+    if (unit1.equals(unit2)) {
+        win = 0;
+        return "empate";
+    } else if (("horse".equals(unit1) && "knight".equals(unit2)) || 
+               ("crossBow".equals(unit1) && "horse".equals(unit2)) ||
+               ("knight".equals(unit1) && "crossBow".equals(unit2))) {
+        win = 2;
+        return unit2;
+    } else {
+        win = 1;
+        return unit1;
+    }
+}
+
     
     public void towerDamage(int numTower){
         
@@ -225,7 +209,7 @@ public class Game{
     public void movementBotlane(JLabel label, int x, int y) {
     System.out.println("VOY POR BOT");
     
-    int delay = 10; // intervalo de tiempo en milisegundos
+    int delay = 10; 
      timer = new Timer(delay, new ActionListener() {
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -239,16 +223,16 @@ public class Game{
                 timer.start();
             }
                 
-              // Mover en X primero
+              // PRIMERO SE MUEVE EN X
             if (posX < x && label.isVisible()) {
                 posX+=5;
             } else if (posX > x) {
                 posX--;
             }
             
-            // Luego mover en Y
+            // LUEGO EN Y
             if (posY < y && posX == x && label.isVisible()) {
-                posY+=30;
+                posY+=300;
             } else if (posY > y && posX == x) {
                 posY--;
             }
@@ -279,21 +263,21 @@ public class Game{
     public  void movementToplane(JLabel label, int x, int y) {
     System.out.println("VOY POR TOP");
 
-    int delay = 10; // intervalo de tiempo en milisegundos
+    int delay = 10; 
     Timer timer = new Timer(delay, new ActionListener() {
         @Override
         public void actionPerformed(ActionEvent e) {
             int posX = label.getX();
             int posY = label.getY();
 
-            // Mover en Y primero
+            // SE MUEVE EN Y PRIMERO
             if (posY < y) {
                 posY++;
             } else if (posY > y) {
                 posY--;
             }
 
-            // Luego mover en X
+            // LUEGO EN X
             if (posX < x && posY == y) {
                 posX++;
             } else if (posX > x && posY == y) {

@@ -9,7 +9,6 @@ import Domain.Unit;
 import com.panamahitek.ArduinoException;
 import com.panamahitek.PanamaHitek_Arduino;
 import java.awt.Color;
-import java.awt.Container;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -18,9 +17,7 @@ import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
-import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
-import javax.swing.SwingWorker;
 import javax.swing.Timer;
 import javax.swing.border.Border;
 import javax.swing.border.LineBorder;
@@ -33,6 +30,7 @@ import jssc.SerialPortException;
  */
 public class GameWindow extends javax.swing.JFrame{
     
+    // ------------------------------ VARIABLES GLOBALES NECESARIAS ------------------------------
     public PanamaHitek_Arduino arduino;
     String messageArduino="";
     Game game;
@@ -42,17 +40,208 @@ public class GameWindow extends javax.swing.JFrame{
     public ArrayList<Unit> unitList = new ArrayList<>();
     public ArrayList<Unit> enemyUnitList = new ArrayList<>();
 
-     
-     
-    public boolean isPaused() {
-        return paused;
+    String SelectedUnit;
+    private final Object pauseLock = new Object();  
+   
+    ImageIcon imgEnemy = new ImageIcon(getClass().getResource("/img/UNITS/UNITS1/knightGameEnemy.png"));
+    public JLabel enemyLabel = new JLabel(imgEnemy);
+    public Unit enemyUnit = new Unit();
+   
+    public  ImageIcon imgSelection = new ImageIcon(getClass().getResource("/img/HUD/HUD1/Selection.png"));
+    public  JLabel selection = new JLabel(imgSelection);
+    
+    
+    ////////////////////////////////////////////////////// AQUI INICIA EL CODIGO LIMPIO /////////////////////////////////////////////////////////////
+    public GameWindow() { // INICIALIZA LA VENTANA
+    initializeGameWindow();
+    //initComponents();
     }
     
+    private void init() {// INICIALIZA LOS COMPONENTES GRAFICOS
+//        createAndAddUnits();
+        setupUIElements();
+    }
+    
+//    private void createAndAddUnits() {
+// 
+//    }
 
+    private void setupUIElements() { // EN ESTE METODO SE CREAN LOS ELEMENTOS GRAFICOS PARA MOSTRARLOS EN LA GUI
+        setLayout(null);
+        // -------------------------------------- PRUEBAS CON ENEMIGOS ---------------------------------------------
+        int x = 600; 
+        int y = 540; 
+        enemyLabel.setBounds(x, y,imgEnemy.getIconWidth(),imgEnemy.getIconHeight());
+        Border border = new LineBorder(Color.BLACK, 2);
+        enemyLabel.setBorder(border);
+        enemyUnit = new Unit(enemyLabel, SelectedUnit, 1);
 
-private final Object pauseLock = new Object();
+        // Agregar JLabel al ArrayList
+        enemyUnitList.add(enemyUnit);
+        
+        this.add(enemyUnit.getLabel());
+        selection.setBounds(425 , 590, 100, 100);              
+        // -----------------------------------------------------------------------------------------------------------
+        
+        JLabel fake = new JLabel();
+        fake.setBounds(170 , 590, 100, 100);
+        game.Selection(fake, messageArduino);
+        this.add(selection);
+        
+        // --------------------------------------- AGREGAMOS ELEMENTOS A LA GUI ------------------------------------------------
+        ImageIcon imgKnight = new ImageIcon(getClass().getResource("/img/UNITS/UNITS1/knightpeque.png"));
+        JLabel knight = new JLabel(imgKnight);
+        knight.setBounds(90, 600, 100, 100);
+        this.add(knight);
+        
+        ImageIcon imgHorse = new ImageIcon(getClass().getResource("/img/UNITS/UNITS1/horsepeque.png"));
+        JLabel horse = new JLabel(imgHorse);
+        horse.setBounds(350, 600, 100, 100);
+        this.add(horse);
+        
+        ImageIcon imgCrossBow = new ImageIcon(getClass().getResource("/img/UNITS/UNITS1/crossbowpeque.png"));
+        JLabel crossBow = new JLabel(imgCrossBow);
+        crossBow.setBounds(610, 600, 100, 100);
+        this.add(crossBow);
+        
+        // --------------------------------------------------- MAPA Y HUD ----------------------------
+        ImageIcon imgHub = new ImageIcon(getClass().getResource("/img/HUD/HUD1/Hud1.png"));
+        JLabel hub = new JLabel(imgHub);
+        hub.setBounds(0,590, 800, 120);
+        this.add(hub);
+        
+        
+        ImageIcon imgMap = new ImageIcon(getClass().getResource("/img/HUD/HUD1/Map1.png"));
+        JLabel map = new JLabel(imgMap);
+        map.setBounds(0, 0, 800, 600);
+        this.add(map); 
+        // -----------------------------------------------------------------------------------------------------------
+    }
+    
+    private void initializeGameWindow() { // SE CONFIGURA LA VENTANA Y SE CREAN LOS OBJETOS NECESARIOS PARA EL FUNCIONAMIENTO DEL ARDUINO
+        setSize(815, 745);
+        setLocationRelativeTo(null);
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setLayout(null);
+        arduino = new  PanamaHitek_Arduino();
+        game = new Game(2, 2, arduino);
+        
+        try {
+            setupArduino();
+        } catch (ArduinoException | InterruptedException | SerialPortException ex) {
+            Logger.getLogger(GameWindow.class.getName()).log(Level.SEVERE, null, ex);
+        }          
+        init();
+    }
 
-    public void togglePause() {
+    private void setupArduino() throws ArduinoException, InterruptedException, SerialPortException { // CONFIGURACION DEL ARDUINO
+        arduino.arduinoRXTX("COM3", 9600, createSerialPortListener());
+        Thread.sleep(2000);// ESPERA A QUE EL PUERTO ESTE LISTO PARA ENVIAR Y RECIBIR DATOS
+        arduino.sendData("1");
+        arduino.sendData("2");
+        arduino.sendData("3");
+        arduino.sendData("4");
+    }
+    
+    private void handleArduinoEvent(String messageArduino) {// EN ESTE METODO SE EJECUTAN LAS ACCIONES SEGUN EL BOTON DE LA PROTOBOARD QUE SE PRESIONE
+                                                            // CABE RESALTAR QUE CADA ACCION ESTA DIVIDIDA EN SUS RESPECTIVOS METODOS PARA SU CLARIDAD
+        switch (messageArduino) {
+            case "Boton DERECHA presionado":
+                handleButtonRight();
+            break;
+            case "Boton ARRIBA presionado":
+                handleButtonUp();
+            break;
+            case "Boton ABAJO presionado":
+                handleButtonDown();
+            break;
+            case "Boton IZQUIERDA presionado":
+                handleButtonLeft();
+            break;
+            case "Boton PAUSA presionado":
+                handlePauseButton();
+            break;
+        }
+
+    }
+
+//    private void moveCursor(String direction) {
+//        int position = game.Selection(selection, direction);
+//        selection.setBounds(position, 590, 100, 100);
+//    }
+
+    private void handleButtonUp() {// METODO QUE REALIZA LO QUE SE NECESITA CUANDO SE PRESIONA EL BOTON HACIA ARRIBA
+        System.out.println("PRESIONE ARRIBA");
+        
+        ImageIcon imagen = new ImageIcon();
+        SelectedUnit = game.UnitSelected(game.getSelection());
+        imagen = game.getImageIcon(SelectedUnit);
+                                
+        JLabel label = new JLabel(imagen);
+
+        JLayeredPane layeredPane = getLayeredPane();
+        layeredPane.add(label, JLayeredPane.DEFAULT_LAYER);
+       
+        int x = 10; 
+        int y = 440; 
+        label.setBounds(x, y, imagen.getIconWidth(), imagen.getIconHeight());
+                                        
+        // PROBAR COLISIONES
+        Border border = new LineBorder(Color.BLACK, 2);
+        label.setBorder(border);
+        // -----------------------------------------
+                                
+        game.movementToplane(label, 745, 10);
+        setVisible(true);
+    }
+
+    private void handleButtonDown() {// METODO QUE REALIZA LO QUE SE NECESITA CUANDO SE PRESIONA EL BOTON HACIA ABAJO
+        System.out.println("PRESIONE ABAJO");
+        ImageIcon imagen = new ImageIcon();
+        SelectedUnit = game.UnitSelected(game.getSelection());
+        imagen = game.getImageIcon(SelectedUnit);
+                                
+        JLabel  label = new JLabel(imagen);
+                                
+        // TODO 
+        // manejar los tipos, si es 1 MEDIEVAL, SI ES 2 MAGIA, SI ES 3 MINIONS
+                                
+        Unit unit = new Unit(label, SelectedUnit, 1);
+                                
+        // Agregar JLabel al ArrayList
+        unitList.add(unit);
+
+        JLayeredPane layeredPane = getLayeredPane();
+        layeredPane.add(unit.getLabel(), JLayeredPane.DEFAULT_LAYER);
+                                         
+        int x = 110;
+        int y = 540; 
+        label.setBounds(x, y, imagen.getIconWidth(), imagen.getIconHeight());
+        
+        game.movementBotlane(label, 745, 10);
+        handleCollision(unit, layeredPane, label, enemyLabel);
+        
+        setVisible(true);
+    }
+    
+    private void handleButtonRight() { // METODO QUE REALIZA LO QUE SE NECESITA CUANDO SE PRESIONA EL BOTON HACIA LA DERECHA
+        System.out.println("MUEVO CURSOR A LA DERECHA");
+        int position= game.Selection(selection, "DERECHA");
+        selection.setBounds(position , 590, 100, 100);
+    }
+
+    private void handleButtonLeft() { // METODO QUE REALIZA LO QUE SE NECESITA CUANDO SE PRESIONA EL BOTON HACIA ABAJO
+        System.out.println("MUEVO EL CURSOR A LA IZQUIERDA");
+        int position= game.Selection(selection, "IZQUIERDA");
+        selection.setBounds(position , 590, 100, 100);
+    }
+
+    private void handlePauseButton() { // METODO QUE REALIZA LO QUE SE NECESITA CUANDO SE PRESIONA EL BOTON DE PAUSA
+        System.out.println("PAUSAAAAAAAAAAA");
+        togglePause();
+    }
+    
+    public void togglePause() {// METODO PARA MANEJAR LAS PAUSAS, SI SE PRESIONA 1 VEZ SE PAUSA, SI SE VUELVE A PRESIONAR EL JUEGO SE REANUDA
         paused = !paused;
         if (paused) {
             System.out.println("Juego pausado");
@@ -72,307 +261,91 @@ private final Object pauseLock = new Object();
         }
     }
 
-
-
-
-
-
-    
-    public GameWindow(){
-       
-        setSize(815, 745);
-        setLocationRelativeTo(null);
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
-        setLayout(null);
-        arduino = new PanamaHitek_Arduino();
-        
-        game = new Game(2, 2, arduino);
-        
-        try {
-            arduino.arduinoRXTX("COM3", 9600, listener);
-            Thread.sleep(2000);// ESPERA A QUE EL PUERTO SE ABRA PARA ENVIAR LOS DATOS Y ENCENDER LO LEDS
-            try {
-                arduino.sendData("1");// ENCENDER LED ARDUINO
-                arduino.sendData("2");// ENCENDER LED ARDUINO
-                arduino.sendData("3");// ENCENDER LED ARDUINO
-                arduino.sendData("4");// ENCENDER LED ARDUINO
-            } catch (SerialPortException ex) {
-                Logger.getLogger(GameWindow.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            
-//            arduino.sendData("5");// APAGAR LED ARDUINO
-//            arduino.sendData("6");// APAGAR LED ARDUINO
-//            arduino.sendData("7");// APAGAR LED ARDUINO
-//            arduino.sendData("8");// APAGAR LED ARDUINO
-        } catch (ArduinoException ex) {
-            Logger.getLogger(MainWindow.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (InterruptedException ex) {
-            Logger.getLogger(GameWindow.class.getName()).log(Level.SEVERE, null, ex);
-        }          
-          init();
-    }
-
-    
-    ImageIcon imgEnemy = new ImageIcon(getClass().getResource("/img/UNITS/UNITS1/knightGameEnemy.png"));
-    public JLabel enemyLabel = new JLabel(imgEnemy);
-    public Unit enemyUnit = new Unit();
-   
-    public  ImageIcon imgSelection = new ImageIcon(getClass().getResource("/img/HUD/HUD1/Selection.png"));
-    public  JLabel selection = new JLabel(imgSelection);
-    
-    public void init(){
-        
-        setLayout(null);
-        
-        int x = 600; // reemplaza con la coordenada X deseada
-        int y = 540; // reemplaza con la coordenada Y deseada
-        enemyLabel.setBounds(x, y,imgEnemy.getIconWidth(),imgEnemy.getIconHeight());
+    private void handleCollision(Unit unit,JLayeredPane layeredPane,JLabel label, JLabel enemyLabel) { // METODO QUE FUNCIONA PARA DETECTAR COLISIONES ENTRE 2 LABELS
+        //                                                                                     SI EXISTIERAN COLISIONES LLAMA A OTRO METODO PARA VERIFICAR QUE LABEL SE ELIMINA
         Border border = new LineBorder(Color.BLACK, 2);
-        enemyLabel.setBorder(border);
-        enemyUnit = new Unit(enemyLabel, SelectedUnit, 1);
-         
+        label.setBorder(border);
                                 
-                                 // Agregar JLabel al ArrayList
-                                enemyUnitList.add(enemyUnit);
-        
-        this.add(enemyUnit.getLabel());
-                selection.setBounds(425 , 590, 100, 100);
-                
-                                
-                                
-                JLabel fake = new JLabel();
-                fake.setBounds(170 , 590, 100, 100);
-                game.Selection(fake, messageArduino);
-        this.add(selection);
-        
-        //Tipós de Unidades
-        ImageIcon imgKnight = new ImageIcon(getClass().getResource("/img/UNITS/UNITS1/knightpeque.png"));
-        JLabel knight = new JLabel(imgKnight);
-        knight.setBounds(90, 600, 100, 100);
-        this.add(knight);
-        
-        ImageIcon imgHorse = new ImageIcon(getClass().getResource("/img/UNITS/UNITS1/horsepeque.png"));
-        JLabel horse = new JLabel(imgHorse);
-        horse.setBounds(350, 600, 100, 100);
-        this.add(horse);
-        
-        ImageIcon imgCrossBow = new ImageIcon(getClass().getResource("/img/UNITS/UNITS1/crossbowpeque.png"));
-        JLabel crossBow = new JLabel(imgCrossBow);
-        crossBow.setBounds(610, 600, 100, 100);
-        this.add(crossBow);
-        
-        //Mapa y hub
-        ImageIcon imgHub = new ImageIcon(getClass().getResource("/img/HUD/HUD1/Hud1.png"));
-        JLabel hub = new JLabel(imgHub);
-        hub.setBounds(0,590, 800, 120);
-        this.add(hub);
-        
-        
-        ImageIcon imgMap = new ImageIcon(getClass().getResource("/img/HUD/HUD1/Map1.png"));
-        JLabel map = new JLabel(imgMap);
-        map.setBounds(0, 0, 800, 600);
-        this.add(map);
-        
-        
-        
-        
-    }
-    
-    
-     private void createAndMoveLabel() {
-                                
-                                
-        // Iniciar el Timer para verificar colisiones cada 10 milisegundos
-         
-        if(game.stop==0)
+        collisionTimer = new Timer(10, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+            // Verificar colisión entre label y enemyLabel
+            boolean colision = game.checkCollision(label, enemyLabel);
+                if (colision) {
+                    String unitName= game.encounterWinner();
+                    System.out.println("Hay colisión entre las JLabel.");
+                    int winner=game.win;
+                    System.out.println("GANADOR DEL ENCUENTRO: "+unitName+" Numero: "+winner);
+                    // System.out.println("GANADOR DEL ENCUENTRO: "+game.encounterWinner()+" Numero: "+winner);
+                        switch(winner) {
+                        case 0:
+                            label.setVisible(false);
+                            enemyLabel.setVisible(false);
+                            layeredPane.remove(label);
+                            layeredPane.remove(enemyLabel);
+                            layeredPane.remove(unit.getLabel());
+                            layeredPane.remove(enemyUnit.getLabel());
+                            
+                            // Eliminar JLabel del ArrayList y del JLayeredPane
+                            unitList.remove(unit);
+                            enemyUnitList.remove(enemyUnit);
+                        break;
+                        case 2:
+                            enemyLabel.setVisible(false);
+                            layeredPane.remove(enemyLabel);
+                            layeredPane.remove(enemyUnit.getLabel());
+                            enemyUnitList.remove(enemyUnit);
+                        break;
+                        case 1:
+                            label.setVisible(false);
+                            layeredPane.remove(label);
+                            layeredPane.remove(unit.getLabel());
+                            unitList.remove(unit);
+                        break;
+                        }
+                     //game.stop=1;
+                     revalidate();
+                     repaint();        
+                     collisionTimer.stop();
+                                            
+                     System.gc();
+                     //  JOptionPane.showMessageDialog(null, "GANADOR DEL ENCUENTRO: "+game.encounterWinner()+" Numero: "+winner, "Información", JOptionPane.INFORMATION_MESSAGE);
+                     } else{
+                            game.stop=0;}
+            }
+        });
+        //createAndMoveLabel();
         collisionTimer.start();
     }
-   
-   String SelectedUnit;
-   
-    SerialPortEventListener listener = new SerialPortEventListener() {
+    
+    
+
+        private SerialPortEventListener createSerialPortListener() {// ESTE ES UN METODO QUE UTILIZAMOS PARA QUE EL PROGRAMA ESCUCHE SI SE PRESIONA UN BOTON DESDE LA PROTOBOARD
+            //                                     Y DE ESTA MANERA EJECUTA EL CODIGO DEL ARDUINO PARA QUE LUEGO EL PROGRAMA SEPA QUE ACCION DEBE REALIZAR O SI ESTE DEBE ENCENDER O APAGAR EL LED
+        return new SerialPortEventListener() {
             @Override
             public void serialEvent(SerialPortEvent serialPortEvent) {
-                
                 try {
-                    
-                    if(arduino.isMessageAvailable()==true){
-                      
-                    SwingUtilities.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        
-                        try { 
-                            messageArduino=arduino.printMessage();
-                        } catch (SerialPortException ex) {
-                            Logger.getLogger(GameWindow.class.getName()).log(Level.SEVERE, null, ex);
-                        } catch (ArduinoException ex) {
-                            Logger.getLogger(GameWindow.class.getName()).log(Level.SEVERE, null, ex);
-                        }
-                       
-                         
-                         //JOptionPane.showMessageDialog(null, arduino.printMessage(), "Información", JOptionPane.INFORMATION_MESSAGE);
-                            if (messageArduino.equals("Boton DERECHA presionado")) {
-                                System.out.println("MUEVO CURSOR A LA DERECHA");
-                                int position= game.Selection(selection, "DERECHA");
-                                selection.setBounds(position , 590, 100, 100);
+                    if (arduino.isMessageAvailable()) {
+                        SwingUtilities.invokeLater(new Runnable() {
+                            @Override
+                            public void run() {
+                                try {
+                                    messageArduino = arduino.printMessage();
+                                    handleArduinoEvent(messageArduino);
+                                } catch (SerialPortException | ArduinoException ex) {
+                                    Logger.getLogger(GameWindow.class.getName()).log(Level.SEVERE, null, ex);
+                                }
+
                                 
                             }
-                        
-                            if(messageArduino.equals("Boton ARRIBA presionado")){
-                                System.out.println("PRESIONE ARRIBA");
-                                
-                                ImageIcon imagen = new ImageIcon();
-                                SelectedUnit = game.UnitSelected(game.getSelection());
-                                imagen = game.getImageIcon(SelectedUnit);
-                                
-                                JLabel label = new JLabel(imagen);
-
-                                JLayeredPane layeredPane = getLayeredPane();
-                                layeredPane.add(label, JLayeredPane.DEFAULT_LAYER);
-                                    // Establecer las coordenadas específicas (x, y) donde quieres mostrar el JLabel
-                                int x = 10; // reemplaza con la coordenada X deseada
-                                int y = 440; // reemplaza con la coordenada Y deseada
-                                label.setBounds(x, y, imagen.getIconWidth(), imagen.getIconHeight());
-                                
-                                
-                                // PROBAR COLISIONES
-                                Border border = new LineBorder(Color.BLACK, 2);
-                                label.setBorder(border);
-                                // -----------------------------------------
-                                
-                                game.movementToplane(label, 745, 10);
-                                setVisible(true);
-                            }
-
-                            if (messageArduino.equals("Boton ABAJO presionado")) {
-                                System.out.println("PRESIONE ABAJO");
-                                
-                                
-                                
-                               
-                                
-                                ImageIcon imagen = new ImageIcon();
-                                SelectedUnit = game.UnitSelected(game.getSelection());
-                                imagen = game.getImageIcon(SelectedUnit);
-                                
-                                JLabel  label = new JLabel(imagen);
-                                
-                                // TODO 
-                                // manejar los tipos, si es 1 MEDIEVAL, SI ES 2 MAGIA, SI ES 3 MINIONS
-                                
-                                Unit unit = new Unit(label, SelectedUnit, 1);
-                                
-                                 // Agregar JLabel al ArrayList
-                                unitList.add(unit);
-
-                                JLayeredPane layeredPane = getLayeredPane();
-                                layeredPane.add(unit.getLabel(), JLayeredPane.DEFAULT_LAYER);
-                                
-                                
-                                // Establecer las coordenadas específicas (x, y) donde quieres mostrar el JLabel
-                                int x = 110; // reemplaza con la coordenada X deseada
-                                int y = 540; // reemplaza con la coordenada Y deseada
-                                label.setBounds(x, y, imagen.getIconWidth(), imagen.getIconHeight());
-
-                               
-
-                                game.movementBotlane(label, 745, 10);
-                                
-                                
-                                 // -------------------------------------------- PROBAR COLISIONES ----------------------------------------------------------------------------------
-                                Border border = new LineBorder(Color.BLACK, 2);
-                                label.setBorder(border);
-                                
-                                collisionTimer = new Timer(10, new ActionListener() {
-                                    @Override
-                                    public void actionPerformed(ActionEvent e) {
-                                        // Verificar colisión entre label y enemyLabel
-                                        boolean colision = game.checkCollision(label, enemyLabel);
-                                        if (colision) {
-                                           String unitName= game.encounterWinner();
-                                            System.out.println("Hay colisión entre las JLabel.");
-                                            int winner=game.win;
-                                            System.out.println("GANADOR DEL ENCUENTRO: "+unitName+" Numero: "+winner);
-                                           // System.out.println("GANADOR DEL ENCUENTRO: "+game.encounterWinner()+" Numero: "+winner);
-                                            switch(winner) {
-                                                case 0:
-//                                                    label.setVisible(false);
-                                                    enemyLabel.setVisible(false);
-                                                    layeredPane.remove(unit.getLabel());
-                                                    layeredPane.remove(enemyUnit.getLabel());
-                                                    
-                                                    // Eliminar JLabel del ArrayList y del JLayeredPane
-                                                    unitList.remove(unit);
-                                                    enemyUnitList.remove(enemyUnit);
-                                                    
-                                                   
-                                                    break;
-                                                case 2:
-                                                    enemyLabel.setVisible(false);
-                                                    layeredPane.remove(enemyLabel);
-                                                    layeredPane.remove(enemyUnit.getLabel());
-                                                    enemyUnitList.remove(enemyUnit);
-                                                    
-                                                    
-                                                    break;
-                                                case 1:
-                                                    label.setVisible(false);
-                                                    layeredPane.remove(label);
-                                                    layeredPane.remove(unit.getLabel());
-                                                    unitList.remove(unit);
-                                                    break;
-                                            }
-                                            //game.stop=1;
-                                            revalidate();
-                                            repaint();        
-                                            collisionTimer.stop();
-                                            
-                                            System.gc();
-                                           //  JOptionPane.showMessageDialog(null, "GANADOR DEL ENCUENTRO: "+game.encounterWinner()+" Numero: "+winner, "Información", JOptionPane.INFORMATION_MESSAGE);
-                                        } else {
-                                            game.stop=0;
-                                        }
-                                        
-                                    }
-                                });
-                                // ---------------------------------------------------------------------------------------------------------------------------------------------------------
-                                createAndMoveLabel();
-                                setVisible(true);
-                            }
-
-
-                            if(messageArduino.equals("Boton IZQUIERDA presionado")){
-                                System.out.println("MUEVO EL CURSOR A LA IZQUIERDA");
-                                int position= game.Selection(selection, "IZQUIERDA");
-                                selection.setBounds(position , 590, 100, 100);
-//                                
-                            }
-                        
-                        
-                        
-                        
-                            if (messageArduino.equals("Boton PAUSA presionado")) {
-                                System.out.println("PAUSAAAAAAAAAAA");
-                                togglePause(); // Activa o desactiva la pausa
-                            }
-
+                        });
                     }
-                });
-                            
-                         }
-                       
-                } catch (SerialPortException ex) {
-                    Logger.getLogger(MainWindow.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (ArduinoException ex) {
+                } catch (SerialPortException | ArduinoException ex) {
                     Logger.getLogger(MainWindow.class.getName()).log(Level.SEVERE, null, ex);
                 }
-                
             }
         };
-}
-         
-     
+    }
+}   
     
-    
-
