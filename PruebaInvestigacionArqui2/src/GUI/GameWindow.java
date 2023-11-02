@@ -46,6 +46,10 @@ public class GameWindow extends javax.swing.JFrame{
     ImageIcon imgEnemy = new ImageIcon(getClass().getResource("/img/UNITS/UNITS1/knightGameEnemy.png"));
     public JLabel enemyLabel = new JLabel(imgEnemy);
     public Unit enemyUnit = new Unit();
+    
+    ImageIcon imgEnemy2 = new ImageIcon(getClass().getResource("/img/UNITS/UNITS1/crossbowGameEnemy.png"));
+    public JLabel enemyLabel2 = new JLabel(imgEnemy2);
+    public Unit enemyUnit2 = new Unit();
    
     public  ImageIcon imgSelection = new ImageIcon(getClass().getResource("/img/HUD/HUD1/Selection.png"));
     public  JLabel selection = new JLabel(imgSelection);
@@ -82,6 +86,22 @@ public class GameWindow extends javax.swing.JFrame{
         this.add(enemyUnit.getLabel());
         selection.setBounds(425 , 590, 100, 100);              
         // -----------------------------------------------------------------------------------------------------------
+        
+        
+        // -------------------------------------- PRUEBAS CON ENEMIGOS ---------------------------------------------
+        int x2 = 20; 
+        int y2 = 200; 
+        enemyLabel2.setBounds(x2, y2,imgEnemy2.getIconWidth(),imgEnemy2.getIconHeight());
+        enemyLabel2.setBorder(border);
+        enemyUnit2 = new Unit(enemyLabel2, SelectedUnit, 1);
+
+        // Agregar JLabel al ArrayList
+        enemyUnitList.add(enemyUnit2);
+        
+        this.add(enemyUnit2.getLabel());
+        selection.setBounds(425 , 590, 100, 100);              
+        // -----------------------------------------------------------------------------------------------------------
+        
         
         JLabel fake = new JLabel();
         fake.setBounds(170 , 590, 100, 100);
@@ -178,7 +198,10 @@ public class GameWindow extends javax.swing.JFrame{
         imagen = game.getImageIcon(SelectedUnit);
                                 
         JLabel label = new JLabel(imagen);
-
+        Unit unit = new Unit(label, SelectedUnit, 1);
+         unitList.add(unit);
+        
+        
         JLayeredPane layeredPane = getLayeredPane();
         layeredPane.add(label, JLayeredPane.DEFAULT_LAYER);
        
@@ -192,37 +215,38 @@ public class GameWindow extends javax.swing.JFrame{
         // -----------------------------------------
                                 
         game.movementToplane(label, 745, 10);
+        unit.setCollisionTimer(collisionTimer);
+    
+        handleCollision(unit, layeredPane, label, enemyLabel2);
         setVisible(true);
     }
 
-    private void handleButtonDown() {// METODO QUE REALIZA LO QUE SE NECESITA CUANDO SE PRESIONA EL BOTON HACIA ABAJO
-        System.out.println("PRESIONE ABAJO");
-        ImageIcon imagen = new ImageIcon();
-        SelectedUnit = game.UnitSelected(game.getSelection());
-        imagen = game.getImageIcon(SelectedUnit);
+    private void handleButtonDown() {
+    ImageIcon imagen = new ImageIcon();
+    SelectedUnit = game.UnitSelected(game.getSelection());
+    imagen = game.getImageIcon(SelectedUnit);
                                 
-        JLabel  label = new JLabel(imagen);
-                                
-        // TODO 
-        // manejar los tipos, si es 1 MEDIEVAL, SI ES 2 MAGIA, SI ES 3 MINIONS
-                                
-        Unit unit = new Unit(label, SelectedUnit, 1);
-                                
-        // Agregar JLabel al ArrayList
-        unitList.add(unit);
+    JLabel label = new JLabel(imagen);
+    Unit unit = new Unit(label, SelectedUnit, 1);
+    unitList.add(unit);
 
-        JLayeredPane layeredPane = getLayeredPane();
-        layeredPane.add(unit.getLabel(), JLayeredPane.DEFAULT_LAYER);
+    JLayeredPane layeredPane = getLayeredPane();
+    layeredPane.add(unit.getLabel(), JLayeredPane.DEFAULT_LAYER);
                                          
-        int x = 110;
-        int y = 540; 
-        label.setBounds(x, y, imagen.getIconWidth(), imagen.getIconHeight());
-        
-        game.movementBotlane(label, 745, 10);
-        handleCollision(unit, layeredPane, label, enemyLabel);
-        
-        setVisible(true);
-    }
+    int x = 110;
+    int y = 540; 
+    label.setBounds(x, y, imagen.getIconWidth(), imagen.getIconHeight());
+    
+    game.movementBotlane(label, 745, 10);
+    
+    unit.setCollisionTimer(collisionTimer);
+    
+    handleCollision(unit, layeredPane, label, enemyLabel);
+    
+    
+    
+    setVisible(true);
+}
     
     private void handleButtonRight() { // METODO QUE REALIZA LO QUE SE NECESITA CUANDO SE PRESIONA EL BOTON HACIA LA DERECHA
         System.out.println("MUEVO CURSOR A LA DERECHA");
@@ -263,61 +287,53 @@ public class GameWindow extends javax.swing.JFrame{
 
     private void handleCollision(Unit unit,JLayeredPane layeredPane,JLabel label, JLabel enemyLabel) { // METODO QUE FUNCIONA PARA DETECTAR COLISIONES ENTRE 2 LABELS
         //                                                                                     SI EXISTIERAN COLISIONES LLAMA A OTRO METODO PARA VERIFICAR QUE LABEL SE ELIMINA
-        Border border = new LineBorder(Color.BLACK, 2);
-        label.setBorder(border);
-                                
+        Timer collisionTimer = unit.getCollisionTimer();
         collisionTimer = new Timer(10, new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-            // Verificar colisión entre label y enemyLabel
+        @Override
+        public void actionPerformed(ActionEvent e) {
             boolean colision = game.checkCollision(label, enemyLabel);
-                if (colision) {
-                    String unitName= game.encounterWinner();
-                    System.out.println("Hay colisión entre las JLabel.");
-                    int winner=game.win;
-                    System.out.println("GANADOR DEL ENCUENTRO: "+unitName+" Numero: "+winner);
-                    // System.out.println("GANADOR DEL ENCUENTRO: "+game.encounterWinner()+" Numero: "+winner);
-                        switch(winner) {
-                        case 0:
-                            label.setVisible(false);
-                            enemyLabel.setVisible(false);
-                            layeredPane.remove(label);
-                            layeredPane.remove(enemyLabel);
-                            layeredPane.remove(unit.getLabel());
-                            layeredPane.remove(enemyUnit.getLabel());
-                            
-                            // Eliminar JLabel del ArrayList y del JLayeredPane
-                            unitList.remove(unit);
-                            enemyUnitList.remove(enemyUnit);
+            if (colision) {
+                String unitName = game.encounterWinner();
+                System.out.println("Hay colisión entre las JLabel.");
+                int winner = game.win;
+                System.out.println("GANADOR DEL ENCUENTRO: " + unitName + " Numero: " + winner);
+                switch (winner) {
+                    case 0:
+                        label.setVisible(false);
+                        enemyLabel.setVisible(false);
+                        layeredPane.remove(label);
+                        layeredPane.remove(enemyLabel);
+                        layeredPane.remove(unit.getLabel());
+                        layeredPane.remove(enemyUnit.getLabel());
+                        layeredPane.remove(enemyUnit2.getLabel());
+                        unitList.remove(unit);
+                        enemyUnitList.remove(enemyUnit);
+                        enemyUnitList.remove(enemyUnit2);
                         break;
-                        case 2:
-                            enemyLabel.setVisible(false);
-                            layeredPane.remove(enemyLabel);
-                            layeredPane.remove(enemyUnit.getLabel());
-                            enemyUnitList.remove(enemyUnit);
+                    case 2:
+                        enemyLabel.setVisible(false);
+                        layeredPane.remove(enemyLabel);
+                        layeredPane.remove(enemyUnit.getLabel());
+                        layeredPane.remove(enemyUnit2.getLabel());
+                        enemyUnitList.remove(enemyUnit);
+                        enemyUnitList.remove(enemyUnit2);
                         break;
-                        case 1:
-                            label.setVisible(false);
-                            layeredPane.remove(label);
-                            layeredPane.remove(unit.getLabel());
-                            unitList.remove(unit);
+                    case 1:
+                        label.setVisible(false);
+                        layeredPane.remove(label);
+                        layeredPane.remove(unit.getLabel());
+                        unitList.remove(unit);
                         break;
-                        }
-                     //game.stop=1;
-                     revalidate();
-                     repaint();        
-                     collisionTimer.stop();
-                                            
-                     System.gc();
-                     //  JOptionPane.showMessageDialog(null, "GANADOR DEL ENCUENTRO: "+game.encounterWinner()+" Numero: "+winner, "Información", JOptionPane.INFORMATION_MESSAGE);
-                     } else{
-                            game.stop=0;}
+                }
+                revalidate();
+                repaint();
+                ((Timer) e.getSource()).stop();
             }
-        });
-        //createAndMoveLabel();
+        }
+        
+    });
         collisionTimer.start();
     }
-    
     
 
         private SerialPortEventListener createSerialPortListener() {// ESTE ES UN METODO QUE UTILIZAMOS PARA QUE EL PROGRAMA ESCUCHE SI SE PRESIONA UN BOTON DESDE LA PROTOBOARD

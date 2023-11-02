@@ -232,7 +232,7 @@ public class Game{
             
             // LUEGO EN Y
             if (posY < y && posX == x && label.isVisible()) {
-                posY+=300;
+                posY+=10;
             } else if (posY > y && posX == x) {
                 posY--;
             }
@@ -243,7 +243,6 @@ public class Game{
                 label.setVisible(false);
                 ((Timer) e.getSource()).stop();
                 towerDamage(2);
-                
             }  
             
             
@@ -264,37 +263,48 @@ public class Game{
     System.out.println("VOY POR TOP");
 
     int delay = 10; 
-    Timer timer = new Timer(delay, new ActionListener() {
+     timer = new Timer(delay, new ActionListener() {
         @Override
         public void actionPerformed(ActionEvent e) {
             int posX = label.getX();
             int posY = label.getY();
-
+            if(stop==1){
+                stop=0;
+                timer.stop();
+            }else if(stop==0){
+                
+                timer.start();
+            }
             // SE MUEVE EN Y PRIMERO
-            if (posY < y) {
+            if (posY < y && label.isVisible()) {
                 posY++;
             } else if (posY > y) {
                 posY--;
             }
 
             // LUEGO EN X
-            if (posX < x && posY == y) {
-                posX++;
+            if (posX < x && posY == y && label.isVisible()){
+                posX+=5;
             } else if (posX > x && posY == y) {
                 posX--;
             }
 
             label.setLocation(posX, posY);
 
-            if (posX == x && posY == y) {
+            if (posX == x && posY == y && label.isVisible()) {
+                label.setVisible(false);
                 ((Timer) e.getSource()).stop();
                 towerDamage(2);
                 
             }
         }
     });
-
-    timer.start();
+    if (stop == 0) {
+        timer.start();
+        // Iniciar el temporizador de colisión
+        
+    }
+    
 }
 
     public ImageIcon getImageIcon(String SelectedUnit) {

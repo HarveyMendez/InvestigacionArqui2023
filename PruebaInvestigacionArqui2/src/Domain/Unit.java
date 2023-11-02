@@ -6,6 +6,7 @@ package Domain;
 
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
+import javax.swing.Timer;
 
 /**
  *
@@ -16,9 +17,18 @@ public class Unit {
     private String unitName;
     private int type;
     private ImageIcon image;
+    private Timer collisionTimer;
 
     public Unit() {
         
+    }
+
+    public Timer getCollisionTimer() {
+        return collisionTimer;
+    }
+
+    public void setCollisionTimer(Timer collisionTimer) {
+        this.collisionTimer = collisionTimer;
     }
 
     public ImageIcon getImage() {
