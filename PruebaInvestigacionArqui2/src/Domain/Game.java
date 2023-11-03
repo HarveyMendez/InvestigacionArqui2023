@@ -4,6 +4,7 @@
  */
 package Domain;
 
+import GUI.SkinSelection;
 import com.panamahitek.ArduinoException;
 import com.panamahitek.PanamaHitek_Arduino;
 import java.awt.Rectangle;
@@ -24,12 +25,24 @@ import jssc.SerialPortException;
 public class Game{
     
     private PanamaHitek_Arduino arduino;
+    
+    
     private int tower1;
     private int tower2;
     public int finish = 0;
     public int Selection;
     
+    SkinSelection skin;
     
+    ImageIcon imgKnightHUD;
+    ImageIcon imgKnight;
+    ImageIcon imgEnemyKnight;
+    ImageIcon imgHorseHUD;
+    ImageIcon imgHorse;
+    ImageIcon imgEnemyHorse;
+    ImageIcon imgCrossbowHUD;
+    ImageIcon imgCrossbow;
+    ImageIcon imgEnemyCrossbow;
 
     public int getSelection() {
         return Selection;
@@ -309,17 +322,129 @@ public class Game{
 
     public ImageIcon getImageIcon(String SelectedUnit) {
         ImageIcon imagen = new ImageIcon();
-        
+        skin = new SkinSelection();
             if(SelectedUnit.equalsIgnoreCase("HORSE")){
+                
+                
+        int skinNumber = skin.getSkin();
+        System.out.println("skin: "+skinNumber);
+        switch (skinNumber) {
+            case 1: // SKIN MEDIEVAL
+                
+                
+                
+                //HORSE
+//                imgHorseHUD = new ImageIcon(getClass().getResource("/img/UNITS/UNITS1/horsepeque.png"));
                 imagen = new ImageIcon(getClass().getResource("/img/UNITS/UNITS1/horseGame.png"));
+               // imgEnemyHorse = new ImageIcon(getClass().getResource("/img/UNITS/UNITS1/horseGameEnemy.png"));
+                
+               
+                
+                break;
+                
+            case 2: // SKIN MAGIC
+                
+               
+                
+                //HORSE
+               // imgHorseHUD = new ImageIcon(getClass().getResource("/img/UNITS/UNITS2/horsepeque.png"));
+                imagen = new ImageIcon(getClass().getResource("/img/UNITS/UNITS2/horseGame.png"));
+               // imgEnemyHorse = new ImageIcon(getClass().getResource("/img/UNITS/UNITS2/horseGameEnemy.png"));
+                
+               
+                break;
+                
+            case 3:// SKIN LEAGUE
+                
+                //KNIGHT
+              
+                
+                //HORSE
+               // imgHorseHUD = new ImageIcon(getClass().getResource("/img/UNITS/UNITS3/horsepeque.png"));
+                imagen = new ImageIcon(getClass().getResource("/img/UNITS/UNITS3/horseGame.png"));
+               // imgEnemyHorse = new ImageIcon(getClass().getResource("/img/UNITS/UNITS3/horseGameEnemy.png"));
+                
+               
+                
+                break;
+            
+        }
             }
             
             if(SelectedUnit.equalsIgnoreCase("KNIGHT")){
+                int skinNumber = skin.getSkin();
+        System.out.println("skin: "+skinNumber);
+        switch (skinNumber) {
+            case 1: // SKIN MEDIEVAL
+                
+                //KNIGHT
+              //  imgKnightHUD = new ImageIcon(getClass().getResource("/img/UNITS/UNITS1/knightpeque.png"));
                 imagen = new ImageIcon(getClass().getResource("/img/UNITS/UNITS1/knightGame.png"));
+               // imgEnemyKnight = new ImageIcon(getClass().getResource("/img/UNITS/UNITS1/knightGameEnemy.png"));
+                
+               
+                
+                break;
+                
+            case 2: // SKIN MAGIC
+                
+                //KNIGHT
+               // imgKnightHUD = new ImageIcon(getClass().getResource("/img/UNITS/UNITS2/knightpeque.png"));
+                imagen = new ImageIcon(getClass().getResource("/img/UNITS/UNITS2/knightGame.png"));
+              //  imgEnemyKnight = new ImageIcon(getClass().getResource("/img/UNITS/UNITS2/knightGameEnemy.png"));
+                
+                
+                break;
+                
+            case 3:// SKIN LEAGUE
+                
+                //KNIGHT
+               // imgKnightHUD = new ImageIcon(getClass().getResource("/img/UNITS/UNITS3/knightpeque.png"));
+                imagen = new ImageIcon(getClass().getResource("/img/UNITS/UNITS3/knightGame.png"));
+               // imgEnemyKnight = new ImageIcon(getClass().getResource("/img/UNITS/UNITS3/knightGameEnemy.png"));
+                
+               
+                break;
+            
+        }
             }
             
             if(SelectedUnit.equalsIgnoreCase("CROSSBOWMAN")){
+                int skinNumber = skin.getSkin();
+        System.out.println("skin: "+skinNumber);
+        switch (skinNumber) {
+            case 1: // SKIN MEDIEVAL
+            
+                //CROSSBOW
+               // imgCrossbowHUD = new ImageIcon(getClass().getResource("/img/UNITS/UNITS1/crossbowpeque.png"));
                 imagen = new ImageIcon(getClass().getResource("/img/UNITS/UNITS1/crossbowGame.png"));
+               // imgEnemyCrossbow = new ImageIcon(getClass().getResource("/img/UNITS/UNITS1/crossbowGameEnemy.png"));
+           
+                break;
+                
+            case 2: // SKIN MAGIC
+             
+                //CROSSBOW
+               // imgCrossbowHUD = new ImageIcon(getClass().getResource("/img/UNITS/UNITS2/crossbowpeque.png"));
+                imagen = new ImageIcon(getClass().getResource("/img/UNITS/UNITS2/crossbowGame.png"));
+               // imgEnemyCrossbow = new ImageIcon(getClass().getResource("/img/UNITS/UNITS2/crossbowGameEnemy.png"));
+                
+          
+                break;
+                
+            case 3:// SKIN LEAGUE
+                
+             
+                //CROSSBOW
+              //  imgCrossbowHUD = new ImageIcon(getClass().getResource("/img/UNITS/UNITS3/crossbowpeque.png"));
+                imagen = new ImageIcon(getClass().getResource("/img/UNITS/UNITS3/crossbowGame.png"));
+              //  imgEnemyCrossbow = new ImageIcon(getClass().getResource("/img/UNITS/UNITS3/crossbowGameEnemy.png"));
+                
+                
+                
+                break;
+            
+        }
             }
             System.out.println("Unidad seleccionada: " + SelectedUnit);
             

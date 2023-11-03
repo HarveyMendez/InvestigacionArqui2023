@@ -34,6 +34,7 @@ public class GameWindow extends javax.swing.JFrame{
     public PanamaHitek_Arduino arduino;
     String messageArduino="";
     Game game;
+    SkinSelection skin;
     private boolean paused = false;
     private Timer collisionTimer; 
     
@@ -42,6 +43,19 @@ public class GameWindow extends javax.swing.JFrame{
 
     String SelectedUnit;
     private final Object pauseLock = new Object();  
+    
+    ImageIcon imgKnightHUD;
+    ImageIcon imgKnight;
+    ImageIcon imgEnemyKnight;
+    ImageIcon imgHorseHUD;
+    ImageIcon imgHorse;
+    ImageIcon imgEnemyHorse;
+    ImageIcon imgCrossbowHUD;
+    ImageIcon imgCrossbow;
+    ImageIcon imgEnemyCrossbow;
+    
+    ImageIcon imgHUD;
+    ImageIcon imgMap;
    
     ImageIcon imgEnemy = new ImageIcon(getClass().getResource("/img/UNITS/UNITS1/knightGameEnemy.png"));
     public JLabel enemyLabel = new JLabel(imgEnemy);
@@ -63,12 +77,91 @@ public class GameWindow extends javax.swing.JFrame{
     
     private void init() {// INICIALIZA LOS COMPONENTES GRAFICOS
 //        createAndAddUnits();
+        getSelectedSkin();
         setupUIElements();
     }
     
 //    private void createAndAddUnits() {
 // 
 //    }
+    
+    
+    private void getSelectedSkin(){
+        
+        int skinNumber = skin.getSkin();
+        System.out.println("skin: "+skinNumber);
+        switch (skinNumber) {
+            case 1: // SKIN MEDIEVAL
+                
+                //KNIGHT
+                imgKnightHUD = new ImageIcon(getClass().getResource("/img/UNITS/UNITS1/knightpeque.png"));
+                imgKnight = new ImageIcon(getClass().getResource("/img/UNITS/UNITS1/knightGame.png"));
+                imgEnemyKnight = new ImageIcon(getClass().getResource("/img/UNITS/UNITS1/knightGameEnemy.png"));
+                
+                //HORSE
+                imgHorseHUD = new ImageIcon(getClass().getResource("/img/UNITS/UNITS1/horsepeque.png"));
+                imgHorse = new ImageIcon(getClass().getResource("/img/UNITS/UNITS1/horseGame.png"));
+                imgEnemyHorse = new ImageIcon(getClass().getResource("/img/UNITS/UNITS1/horseGameEnemy.png"));
+                
+                //CROSSBOW
+                imgCrossbowHUD = new ImageIcon(getClass().getResource("/img/UNITS/UNITS1/crossbowpeque.png"));
+                imgCrossbow = new ImageIcon(getClass().getResource("/img/UNITS/UNITS1/crossbowGame.png"));
+                imgEnemyCrossbow = new ImageIcon(getClass().getResource("/img/UNITS/UNITS1/crossbowGameEnemy.png"));
+                
+                //HUD
+                imgMap = new ImageIcon(getClass().getResource("/img/HUD/HUD1/Map1.png"));
+                imgHUD = new ImageIcon(getClass().getResource("/img/HUD/HUD1/Hud1.png"));
+                
+                break;
+                
+            case 2: // SKIN MAGIC
+                
+                //KNIGHT
+                imgKnightHUD = new ImageIcon(getClass().getResource("/img/UNITS/UNITS2/knightpeque.png"));
+                imgKnight = new ImageIcon(getClass().getResource("/img/UNITS/UNITS2/knightGame.png"));
+                imgEnemyKnight = new ImageIcon(getClass().getResource("/img/UNITS/UNITS2/knightGameEnemy.png"));
+                
+                //HORSE
+                imgHorseHUD = new ImageIcon(getClass().getResource("/img/UNITS/UNITS2/horsepeque.png"));
+                imgHorse = new ImageIcon(getClass().getResource("/img/UNITS/UNITS2/horseGame.png"));
+                imgEnemyHorse = new ImageIcon(getClass().getResource("/img/UNITS/UNITS2/horseGameEnemy.png"));
+                
+                //CROSSBOW
+                imgCrossbowHUD = new ImageIcon(getClass().getResource("/img/UNITS/UNITS2/crossbowpeque.png"));
+                imgCrossbow = new ImageIcon(getClass().getResource("/img/UNITS/UNITS2/crossbowGame.png"));
+                imgEnemyCrossbow = new ImageIcon(getClass().getResource("/img/UNITS/UNITS2/crossbowGameEnemy.png"));
+                
+                //HUD
+                imgMap = new ImageIcon(getClass().getResource("/img/HUD/HUD2/Map1.png"));
+                imgHUD = new ImageIcon(getClass().getResource("/img/HUD/HUD2/Hud1.png"));
+                
+                break;
+                
+            case 3:// SKIN LEAGUE
+                
+                //KNIGHT
+                imgKnightHUD = new ImageIcon(getClass().getResource("/img/UNITS/UNITS3/knightpeque.png"));
+                imgKnight = new ImageIcon(getClass().getResource("/img/UNITS/UNITS3/knightGame.png"));
+                imgEnemyKnight = new ImageIcon(getClass().getResource("/img/UNITS/UNITS3/knightGameEnemy.png"));
+                
+                //HORSE
+                imgHorseHUD = new ImageIcon(getClass().getResource("/img/UNITS/UNITS3/horsepeque.png"));
+                imgHorse = new ImageIcon(getClass().getResource("/img/UNITS/UNITS3/horseGame.png"));
+                imgEnemyHorse = new ImageIcon(getClass().getResource("/img/UNITS/UNITS3/horseGameEnemy.png"));
+                
+                //CROSSBOW
+                imgCrossbowHUD = new ImageIcon(getClass().getResource("/img/UNITS/UNITS3/crossbowpeque.png"));
+                imgCrossbow = new ImageIcon(getClass().getResource("/img/UNITS/UNITS3/crossbowGame.png"));
+                imgEnemyCrossbow = new ImageIcon(getClass().getResource("/img/UNITS/UNITS3/crossbowGameEnemy.png"));
+                
+                //HUD
+                imgMap = new ImageIcon(getClass().getResource("/img/HUD/HUD3/Map1.png"));
+                imgHUD = new ImageIcon(getClass().getResource("/img/HUD/HUD3/Hud1.png"));
+                
+                break;
+            
+        }
+    }
 
     private void setupUIElements() { // EN ESTE METODO SE CREAN LOS ELEMENTOS GRAFICOS PARA MOSTRARLOS EN LA GUI
         setLayout(null);
@@ -109,29 +202,29 @@ public class GameWindow extends javax.swing.JFrame{
         this.add(selection);
         
         // --------------------------------------- AGREGAMOS ELEMENTOS A LA GUI ------------------------------------------------
-        ImageIcon imgKnight = new ImageIcon(getClass().getResource("/img/UNITS/UNITS1/knightpeque.png"));
-        JLabel knight = new JLabel(imgKnight);
+        //ImageIcon imgKnight = new ImageIcon(getClass().getResource("/img/UNITS/UNITS1/knightpeque.png"));
+        JLabel knight = new JLabel(imgKnightHUD);
         knight.setBounds(90, 600, 100, 100);
         this.add(knight);
         
-        ImageIcon imgHorse = new ImageIcon(getClass().getResource("/img/UNITS/UNITS1/horsepeque.png"));
-        JLabel horse = new JLabel(imgHorse);
+        //ImageIcon imgHorse = new ImageIcon(getClass().getResource("/img/UNITS/UNITS1/horsepeque.png"));
+        JLabel horse = new JLabel(imgHorseHUD);
         horse.setBounds(350, 600, 100, 100);
         this.add(horse);
         
-        ImageIcon imgCrossBow = new ImageIcon(getClass().getResource("/img/UNITS/UNITS1/crossbowpeque.png"));
-        JLabel crossBow = new JLabel(imgCrossBow);
+        //ImageIcon imgCrossBow = new ImageIcon(getClass().getResource("/img/UNITS/UNITS1/crossbowpeque.png"));
+        JLabel crossBow = new JLabel(imgCrossbowHUD);
         crossBow.setBounds(610, 600, 100, 100);
         this.add(crossBow);
         
         // --------------------------------------------------- MAPA Y HUD ----------------------------
-        ImageIcon imgHub = new ImageIcon(getClass().getResource("/img/HUD/HUD1/Hud1.png"));
-        JLabel hub = new JLabel(imgHub);
-        hub.setBounds(0,590, 800, 120);
-        this.add(hub);
+//        ImageIcon imgHub = new ImageIcon(getClass().getResource("/img/HUD/HUD1/Hud1.png"));
+        JLabel hud = new JLabel(imgHUD);
+        hud.setBounds(0,590, 800, 120);
+        this.add(hud);
         
         
-        ImageIcon imgMap = new ImageIcon(getClass().getResource("/img/HUD/HUD1/Map1.png"));
+//        ImageIcon imgMap = new ImageIcon(getClass().getResource("/img/HUD/HUD1/Map1.png"));
         JLabel map = new JLabel(imgMap);
         map.setBounds(0, 0, 800, 600);
         this.add(map); 
@@ -150,7 +243,8 @@ public class GameWindow extends javax.swing.JFrame{
             setupArduino();
         } catch (ArduinoException | InterruptedException | SerialPortException ex) {
             Logger.getLogger(GameWindow.class.getName()).log(Level.SEVERE, null, ex);
-        }          
+        }     
+        skin = new SkinSelection(1);
         init();
     }
 
@@ -333,7 +427,7 @@ public class GameWindow extends javax.swing.JFrame{
     }
     
 
-        private SerialPortEventListener createSerialPortListener() {// ESTE ES UN METODO QUE UTILIZAMOS PARA QUE EL PROGRAMA ESCUCHE SI SE PRESIONA UN BOTON DESDE LA PROTOBOARD
+        public SerialPortEventListener createSerialPortListener() {// ESTE ES UN METODO QUE UTILIZAMOS PARA QUE EL PROGRAMA ESCUCHE SI SE PRESIONA UN BOTON DESDE LA PROTOBOARD
             //                                     Y DE ESTA MANERA EJECUTA EL CODIGO DEL ARDUINO PARA QUE LUEGO EL PROGRAMA SEPA QUE ACCION DEBE REALIZAR O SI ESTE DEBE ENCENDER O APAGAR EL LED
         return new SerialPortEventListener() {
             @Override

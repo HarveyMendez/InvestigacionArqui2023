@@ -17,8 +17,9 @@ public class PruebaInvestigacionArqui2 {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        GameWindow mw = new GameWindow();
-        
+        //GameWindow gw = new GameWindow();
+        MainWindow mw = new MainWindow();
+        //gw.setVisible(true);
         mw.setVisible(true);
     }
     
