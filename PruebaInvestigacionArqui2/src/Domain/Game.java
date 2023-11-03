@@ -3,19 +3,11 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package Domain;
-
-import com.panamahitek.ArduinoException;
-import com.panamahitek.PanamaHitek_Arduino;
-import java.awt.Rectangle;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.awt.Graphics;
+import java.util.ArrayList;
+import java.util.Random;
 import javax.swing.ImageIcon;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.Timer;
-import jssc.SerialPortException;
+
 
 /**
  *
@@ -23,310 +15,228 @@ import jssc.SerialPortException;
  */
 public class Game{
     
-    private PanamaHitek_Arduino arduino;
     private int tower1;
     private int tower2;
     public int finish = 0;
     public int Selection;
+    public int pause = 0;
     
+    private Map map;
+    private ArrayList<Unit> units = new ArrayList<>();
+    private ArrayList<Unit> enemyUnits = new ArrayList<>();
     
+    public Game(int tower1, int tower2) {
+        this.tower1 = tower1;
+        this.tower2 = tower2;
+        map = new Map();
+    }
+    
+    public void chargeMap(Graphics g) {
+        map.draw(g);
+    }
 
     public int getSelection() {
         return Selection;
     }
-    
-    
-    public Game(int tower1, int tower2, PanamaHitek_Arduino arduino) {
-        this.tower1 = tower1;
-        this.tower2 = tower2;
-        this.arduino = arduino; 
-    }
-    
-    
-    public int Selection(JLabel label, String msgArduino) {
-    int x = label.getX();
-        
-    final int IZQUIERDA = 170;
-    final int CENTRO = 425;
-    final int DERECHA = 700;
-        
-    switch (x) {
-        case CENTRO:
-            x = (msgArduino.equalsIgnoreCase("IZQUIERDA")) ? IZQUIERDA : DERECHA;
-            this.Selection=x;
-            break;
-        case IZQUIERDA:
-            x = (msgArduino.equalsIgnoreCase("IZQUIERDA")) ? DERECHA : CENTRO;
-            this.Selection=x;
-            break;
-        case DERECHA:
-            x = (msgArduino.equalsIgnoreCase("IZQUIERDA")) ? CENTRO : IZQUIERDA;
-            this.Selection=x;
-            break;
-        default:
-            if(msgArduino.equalsIgnoreCase("")){
-            x=CENTRO;
-            this.Selection=x;}
-            break;
+
+    public int Selection(int x, String msgArduino) {
+
+        final int IZQUIERDA = 170;
+        final int CENTRO = 425;
+        final int DERECHA = 700;
+
+        switch (x) {
+            case CENTRO:
+                x = (msgArduino.equalsIgnoreCase("IZQUIERDA")) ? IZQUIERDA : DERECHA;
+                this.Selection = x;
+                break;
+            case IZQUIERDA:
+                x = (msgArduino.equalsIgnoreCase("IZQUIERDA")) ? DERECHA : CENTRO;
+                this.Selection = x;
+                break;
+            case DERECHA:
+                x = (msgArduino.equalsIgnoreCase("IZQUIERDA")) ? CENTRO : IZQUIERDA;
+                this.Selection = x;
+                break;
+            default:
+                if (msgArduino.equalsIgnoreCase("")) {
+                    x = CENTRO;
+                    this.Selection = x;
+                }
+                break;
+        }
+
+        return x;
     }
 
-    return x;
-}
-
-    
-    public String UnitSelected(int xPosition){
+    public int UnitSelected(int xPosition) {
         xPosition = this.Selection;
-        String unitName="UNIT NOT FOUND";
+        int typeUnit = 0;
         switch (xPosition) {
-        case 425: // CENTRO
-            unitName = "HORSE";
-            break;
-        case 170: // IZQUIERDA
-            unitName = "KNIGHT";
-            break;
-        case 700: // DERECHA
-            unitName = "CROSSBOWMAN";
-            break;
-    }
-        
-        return unitName;
+            case 425: // CENTRO
+                typeUnit = 3;
+                break;
+            case 170: // IZQUIERDA
+                typeUnit = 1;
+                break;
+            case 700: // DERECHA
+                typeUnit = 2;
+                break;
+        }
+        return typeUnit;
     }
 
-   public ImageIcon icon1 = new ImageIcon();
-   public ImageIcon icon2 = new ImageIcon();
-   public String playerUnitName;
-   public String enemyUnitName;
-    public boolean checkCollision(JLabel label1, JLabel label2) {
-        Rectangle rectLabel1 = label1.getBounds();
-            Rectangle rectLabel2 = label2.getBounds();
-        if(label1.isVisible() && label2.isVisible()){
-            
-        
-        icon1 = (ImageIcon) label1.getIcon();
-        icon2 = (ImageIcon) label2.getIcon();
-        
-        if(icon1.toString().equalsIgnoreCase("file:/C:/Users/jodas/OneDrive/Desktop/InvestigacionArqui2023/PruebaInvestigacionArqui2/build/classes/img/UNITS/UNITS1/knightGame.png")){
-            playerUnitName="knight";
-        }
-        if(icon1.toString().equalsIgnoreCase("file:/C:/Users/jodas/OneDrive/Desktop/InvestigacionArqui2023/PruebaInvestigacionArqui2/build/classes/img/UNITS/UNITS1/horseGame.png")){
-            playerUnitName="horse";
-        }
-        if(icon1.toString().equalsIgnoreCase("file:/C:/Users/jodas/OneDrive/Desktop/InvestigacionArqui2023/PruebaInvestigacionArqui2/build/classes/img/UNITS/UNITS1/crossbowGame.png")){
-            playerUnitName="crossBow";
-        }
-        if(icon2.toString().equalsIgnoreCase("file:/C:/Users/jodas/OneDrive/Desktop/InvestigacionArqui2023/PruebaInvestigacionArqui2/build/classes/img/UNITS/UNITS1/knightGameEnemy.png")){
-            enemyUnitName="knight";
-        }
-        if(icon2.toString().equalsIgnoreCase("file:/C:/Users/jodas/OneDrive/Desktop/InvestigacionArqui2023/PruebaInvestigacionArqui2/build/classes/img/UNITS/UNITS1/horseGameEnemy.png")){
-            enemyUnitName="horse";
-        }
-        if(icon2.toString().equalsIgnoreCase("file:/C:/Users/jodas/OneDrive/Desktop/InvestigacionArqui2023/PruebaInvestigacionArqui2/build/classes/img/UNITS/UNITS1/crossbowGameEnemy.png")){
-            enemyUnitName="crossBow";
-        }
-        return rectLabel1.intersects(rectLabel2);
-        }else{
-            return false; 
-        }
-//        return rectLabel1.intersects(rectLabel2);
-    }
-    
-    public int win;
- public String encounterWinner() {
-    String unit2 = playerUnitName;
-    String unit1 = enemyUnitName;
-    
-    if (unit1.equals(unit2)) {
-        win = 0;
-        return "empate";
-    } else if (("horse".equals(unit1) && "knight".equals(unit2)) || 
-               ("crossBow".equals(unit1) && "horse".equals(unit2)) ||
-               ("knight".equals(unit1) && "crossBow".equals(unit2))) {
-        win = 2;
-        return unit2;
-    } else {
-        win = 1;
-        return unit1;
-    }
-}
+    public boolean checkCollision() {
 
-    
-    public void towerDamage(int numTower){
+        for (Unit unit1 : units) {
+
+            //CHOQUE CON TORRE ENEMIGA
+            if (unit1.getX() == 745 && unit1.getY() == 10) {
+                System.out.println("Daño torre enemiga");
+                units.remove(unit1);
+                towerDamage(2);
+                return true;
+
+            }
+            for (Unit unit2 : enemyUnits) {
+
+                //CHOQUE CON TORRE ALIADA
+                if (unit2.getX() == 10 && unit2.getY() == 540) {
+                    System.out.println("Daño torre aliada");
+                    enemyUnits.remove(unit2);
+                    towerDamage(1);
+                    return true;
+                }
+
+                if (unit1 != unit2 && unit1.collision(unit2)) {
+
+
+                    
+                    //COQUE CON OTRA UNIDAD
+                    int winner = this.encounterWinner(unit1.getType(), unit2.getType());
+                    if (winner == 1) {
+                        enemyUnits.remove(unit2);
+                    }
+                    if (winner == 0) {
+                        enemyUnits.remove(unit2);
+                        units.remove(unit1);
+
+                    }
+                    if (winner == -1) {
+                        units.remove(unit1);
+                    }
+                    
+                    return true;
+                }
+
+            }
+        }
+        return false;
+    }
+
+    public int encounterWinner(int type1, int type2) {
         
-        if(numTower == 1){
+        if (type1 == type2) {
+            return 0; // Empate
+        }
+        if ((type1 == 1 && type2 == 3) ||
+            (type1 == 2 && type2 == 1) ||
+            (type1 == 3 && type2 == 2)) {
+            return 1; // Usuario gana
+        }
+        return -1; // Computadora gana
+        
+    }
+
+    public void towerDamage(int numTower) {
+        
+        if(numTower == 1) {
             this.tower1 -=1;
-            try {
-                arduino.sendData("7");// APAGAR LED ARDUINO
-            } catch (ArduinoException ex) {
-                Logger.getLogger(Game.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (SerialPortException ex) {
-                Logger.getLogger(Game.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            if(tower1 ==0){
-                try {
-                    arduino.sendData("8");// APAGAR LED ARDUINO
-                    finish=1;
-                    JOptionPane.showMessageDialog(null, "¡PERDISTE!", "FIN DEL JUEGO", JOptionPane.WARNING_MESSAGE);
-                } catch (ArduinoException ex) {
-                    Logger.getLogger(Game.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (SerialPortException ex) {
-                    Logger.getLogger(Game.class.getName()).log(Level.SEVERE, null, ex);
-                }
+            if(tower1 == 0) {
+                this.finish = 1;
             }
         }
         
-        if(numTower == 2){
-            try {
-                this.tower2 -=1;
-                arduino.sendData("5");// APAGAR LED ARDUINO 
-            } catch (ArduinoException ex) {
-                Logger.getLogger(Game.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (SerialPortException ex) {
-                Logger.getLogger(Game.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            if(tower2 ==0){
-                try {
-                    arduino.sendData("6");// APAGAR LED ARDUINO
-                    finish=1;
-                    JOptionPane.showMessageDialog(null, "¡GANASTE!", "FIN DEL JUEGO", JOptionPane.INFORMATION_MESSAGE);
-                } catch (ArduinoException ex) {
-                    Logger.getLogger(Game.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (SerialPortException ex) {
-                    Logger.getLogger(Game.class.getName()).log(Level.SEVERE, null, ex);
-                }
+        if(numTower == 2) {
+            this.tower2 -=1;
+            if(tower2 == 0) {
+                this.finish = 1;
             }
         }
         
-        
-        
-        System.out.println("VIDA TORRE 1:"+tower1+"/2");
-        System.out.println("VIDA TORRE 2:"+tower2+"/2");
-        
     }
-    
-    public int stop;
-    Timer timer;
-   
-    public void movementBotlane(JLabel label, int x, int y) {
-    System.out.println("VOY POR BOT");
-    
-    int delay = 10; 
-     timer = new Timer(delay, new ActionListener() {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            int posX = label.getX();
-            int posY = label.getY();
-            if(stop==1){
-                stop=0;
-                timer.stop();
-            }else if(stop==0){
-                
-                timer.start();
-            }
-                
-              // PRIMERO SE MUEVE EN X
-            if (posX < x && label.isVisible()) {
-                posX++;
-            } else if (posX > x) {
-                posX--;
-            }
-            
-            // LUEGO EN Y
-            if (posY < y && posX == x && label.isVisible()) {
-                posY++;
-            } else if (posY > y && posX == x) {
-                posY--;
-            }
 
-            label.setLocation(posX, posY);
+    public void refresh2() {
 
-            if (posX == x && posY == y && label.isVisible()) {
-                label.setVisible(false);
-                ((Timer) e.getSource()).stop();
-                towerDamage(2);
-            }  
-            
-            
+
+        for (Unit unit : units) {
+            unit.move();
         }
-    });
-     if (stop == 0) {
-        timer.start();
-        // Iniciar el temporizador de colisión
-        
-    }
-       
-    
-    
-}
 
-    
-    public  void movementToplane(JLabel label, int x, int y) {
-    System.out.println("VOY POR TOP");
-
-    int delay = 10; 
-     timer = new Timer(delay, new ActionListener() {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            int posX = label.getX();
-            int posY = label.getY();
-            if(stop==1){
-                stop=0;
-                timer.stop();
-            }else if(stop==0){
-                
-                timer.start();
-            }
-            // SE MUEVE EN Y PRIMERO
-            if (posY < y && label.isVisible()) {
-                posY++;
-            } else if (posY > y) {
-                posY--;
-            }
-
-            // LUEGO EN X
-            if (posX < x && posY == y && label.isVisible()){
-                posX++;
-            } else if (posX > x && posY == y) {
-                posX--;
-            }
-
-            label.setLocation(posX, posY);
-
-            if (posX == x && posY == y && label.isVisible()) {
-                label.setVisible(false);
-                ((Timer) e.getSource()).stop();
-                towerDamage(2);
-                
-            }
+        for (Unit unit : enemyUnits) {
+            unit.move();
         }
-    });
-    if (stop == 0) {
-        timer.start();
-        // Iniciar el temporizador de colisión
-        
+ 
+        if (this.checkCollision() == true) {
+        }
+
+    }
+
+    public void refresh(Graphics g) {
+        for (Unit unit : units) {
+            unit.draw(g);
+        }
+        for (Unit unit : enemyUnits) {
+            unit.draw(g);
+        }
+    }
+
+    public void addUnit(int line) {
+
+        Random random = new Random();
+        int randomType = random.nextInt(4 - 1) + 1;
+
+        if (line == 2) {
+            Unit newUnit = new Unit(110, 540, UnitSelected(Selection), line);
+            units.add(newUnit);
+        }
+        if (line == 1) {
+            Unit newUnit = new Unit(10, 440, UnitSelected(Selection), line);
+            units.add(newUnit);
+        }
+        if (line == 3) {
+
+            Unit newUnit = new Unit(700, 10, randomType, line);
+            enemyUnits.add(newUnit);
+        }
+
+        if (line == 4) {
+            Unit newUnit = new Unit(740, 60, randomType, line);
+            enemyUnits.add(newUnit);
+        }
+
     }
     
-}
-
-    public ImageIcon getImageIcon(String SelectedUnit) {
-        ImageIcon imagen = new ImageIcon();
-        
-            if(SelectedUnit.equalsIgnoreCase("HORSE")){
-                imagen = new ImageIcon(getClass().getResource("/img/UNITS/UNITS1/horseGame.png"));
-            }
-            
-            if(SelectedUnit.equalsIgnoreCase("KNIGHT")){
-                imagen = new ImageIcon(getClass().getResource("/img/UNITS/UNITS1/knightGame.png"));
-            }
-            
-            if(SelectedUnit.equalsIgnoreCase("CROSSBOWMAN")){
-                imagen = new ImageIcon(getClass().getResource("/img/UNITS/UNITS1/crossbowGame.png"));
-            }
-            System.out.println("Unidad seleccionada: " + SelectedUnit);
-            
-        return imagen;
+    public boolean getPause() {
+        return this.pause != 0;
     }
-
-
+    
+    public void pause() {
+        if(this.pause == 1){
+            this.pause = 0;
+        }else {
+            this.pause = 1;
+        }
+    }
+    
+    public boolean finish(){
+        if(this.finish == 0){
+            return false;
+        }else {
+            return true;
+        }
+    }
+    
 }
 
     

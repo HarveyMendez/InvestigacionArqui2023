@@ -6,6 +6,7 @@ package Main;
 
 import GUI.GameWindow;
 import GUI.MainWindow;
+import javax.swing.JFrame;
 
 /**
  *
@@ -17,9 +18,15 @@ public class PruebaInvestigacionArqui2 {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        GameWindow mw = new GameWindow();
         
-        mw.setVisible(true);
+        JFrame frame = new JFrame("Mi Juego");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setSize(815, 745);
+        frame.setLocationRelativeTo(null);
+        frame.setLayout(null);
+        frame.add(new GameWindow()); // Agrega la instancia de tu panel personalizado
+        frame.setVisible(true);
+
     }
-    
+
 }
