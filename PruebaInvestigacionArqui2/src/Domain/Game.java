@@ -24,13 +24,15 @@ import jssc.SerialPortException;
  */
 public class Game{
     
-    private PanamaHitek_Arduino arduino;
+    public PanamaHitek_Arduino arduino;
     
     
     private int tower1;
     private int tower2;
     public int finish = 0;
     public int Selection;
+    public int damage;
+    public int damageEnemy;
     
     SkinSelection skin;
     
@@ -87,7 +89,7 @@ public class Game{
 }
 
     
-    public String UnitSelected(int xPosition){
+    public String UnitSelected(int xPosition){// METODO PARA OBTENER EL NOMBRE LA UNIDAD SELECCIONADA QUE  SE DESEA JUGAR
         xPosition = this.Selection;
         String unitName="UNIT NOT FOUND";
         switch (xPosition) {
@@ -109,59 +111,65 @@ public class Game{
    public ImageIcon icon2 = new ImageIcon();
    public String playerUnitName;
    public String enemyUnitName;
-    public boolean checkCollision(JLabel label1, JLabel label2) {
-        Rectangle rectLabel1 = label1.getBounds();
-            Rectangle rectLabel2 = label2.getBounds();
-        if(label1.isVisible() && label2.isVisible()){
+    public boolean checkCollision(Unit label1, Enemy label2) {
+        Rectangle rectLabel1 = label1.getLabel().getBounds();
+        Rectangle rectLabel2 = label2.getLabel().getBounds();
+        if(label1.getLabel().isVisible() && label2.getLabel().isVisible()){
             
-        
-        icon1 = (ImageIcon) label1.getIcon();
-        icon2 = (ImageIcon) label2.getIcon();
-        
-        if(icon1.toString().equalsIgnoreCase("file:/C:/Users/jodas/OneDrive/Desktop/InvestigacionArqui2023/PruebaInvestigacionArqui2/build/classes/img/UNITS/UNITS1/knightGame.png")){
-            playerUnitName="knight";
-        }
-        if(icon1.toString().equalsIgnoreCase("file:/C:/Users/jodas/OneDrive/Desktop/InvestigacionArqui2023/PruebaInvestigacionArqui2/build/classes/img/UNITS/UNITS1/horseGame.png")){
-            playerUnitName="horse";
-        }
-        if(icon1.toString().equalsIgnoreCase("file:/C:/Users/jodas/OneDrive/Desktop/InvestigacionArqui2023/PruebaInvestigacionArqui2/build/classes/img/UNITS/UNITS1/crossbowGame.png")){
-            playerUnitName="crossBow";
-        }
-        if(icon2.toString().equalsIgnoreCase("file:/C:/Users/jodas/OneDrive/Desktop/InvestigacionArqui2023/PruebaInvestigacionArqui2/build/classes/img/UNITS/UNITS1/knightGameEnemy.png")){
-            enemyUnitName="knight";
-        }
-        if(icon2.toString().equalsIgnoreCase("file:/C:/Users/jodas/OneDrive/Desktop/InvestigacionArqui2023/PruebaInvestigacionArqui2/build/classes/img/UNITS/UNITS1/horseGameEnemy.png")){
-            enemyUnitName="horse";
-        }
-        if(icon2.toString().equalsIgnoreCase("file:/C:/Users/jodas/OneDrive/Desktop/InvestigacionArqui2023/PruebaInvestigacionArqui2/build/classes/img/UNITS/UNITS1/crossbowGameEnemy.png")){
-            enemyUnitName="crossBow";
-        }
+        playerUnitName=label1.getUnitName();
+        enemyUnitName=label2.getUnitName();
+           
         return rectLabel1.intersects(rectLabel2);
         }else{
+           
             return false; 
         }
 //        return rectLabel1.intersects(rectLabel2);
     }
     
     public int win;
- public String encounterWinner() {
+public int encounterWinner() {
     String unit2 = playerUnitName;
     String unit1 = enemyUnitName;
     
-    if (unit1.equals(unit2)) {
+    System.out.println("Unit1: " + unit1);
+    System.out.println("Unit2: " + unit2);
+    
+    if (unit1.equalsIgnoreCase(unit2)) {
         win = 0;
-        return "empate";
-    } else if (("horse".equals(unit1) && "knight".equals(unit2)) || 
-               ("crossBow".equals(unit1) && "horse".equals(unit2)) ||
-               ("knight".equals(unit1) && "crossBow".equals(unit2))) {
+        System.out.println("Empate");
+        return 0;
+    } else if (("horse".equalsIgnoreCase(unit1) && "knight".equalsIgnoreCase(unit2)) || 
+               ("crossBowMan".equalsIgnoreCase(unit1) && "horse".equalsIgnoreCase(unit2)) ||
+               ("knight".equalsIgnoreCase(unit1) && "crossBowMan".equalsIgnoreCase(unit2))) {
         win = 2;
-        return unit2;
+        System.out.println("Gana Jugador 2");
+        return 2;
     } else {
         win = 1;
-        return unit1;
+        System.out.println("Gana Jugador 1");
+        return 1;
     }
 }
 
+//    public int win;
+// public String encounterWinner() {
+//    String unit2 = playerUnitName;
+//    String unit1 = enemyUnitName;
+//    
+//    if (unit1.equals(unit2)) {
+//        win = 0;
+//        return "empate";
+//    } else if (("horse".equalsIgnoreCase(unit1) && "knight".equalsIgnoreCase(unit2)) || 
+//               ("crossBow".equalsIgnoreCase(unit1) && "horse".equalsIgnoreCase(unit2)) ||
+//               ("knight".equalsIgnoreCase(unit1) && "crossBow".equalsIgnoreCase(unit2))) {
+//        win = 2;
+//        return unit2;
+//    } else {
+//        win = 1;
+//        return unit1;
+//    }
+//}
     
     public void towerDamage(int numTower){
         
@@ -219,7 +227,7 @@ public class Game{
     public int stop;
     Timer timer;
    
-    public void movementBotlane(JLabel label, int x, int y) {
+    public void movementBotlane(JLabel label, int x, int y, int damage) {
     System.out.println("VOY POR BOT");
     
     int delay = 10; 
@@ -255,7 +263,11 @@ public class Game{
             if (posX == x && posY == y && label.isVisible()) {
                 label.setVisible(false);
                 ((Timer) e.getSource()).stop();
-                towerDamage(2);
+                if(damage==2){
+                 towerDamage(2);   
+                }if(damage==1){
+                   towerDamage(1); 
+                }
             }  
             
             
@@ -272,7 +284,7 @@ public class Game{
 }
 
     
-    public  void movementToplane(JLabel label, int x, int y) {
+    public  void movementToplane(JLabel label, int x, int y,int damage) {
     System.out.println("VOY POR TOP");
 
     int delay = 10; 
@@ -307,7 +319,11 @@ public class Game{
             if (posX == x && posY == y && label.isVisible()) {
                 label.setVisible(false);
                 ((Timer) e.getSource()).stop();
-                towerDamage(2);
+                if(damage==2){
+                 towerDamage(2);   
+                }if(damage==1){
+                   towerDamage(1); 
+                }
                 
             }
         }
@@ -446,7 +462,7 @@ public class Game{
             
         }
             }
-            System.out.println("Unidad seleccionada: " + SelectedUnit);
+            
             
         return imagen;
     }
@@ -457,4 +473,5 @@ public class Game{
     
     
     
+
 

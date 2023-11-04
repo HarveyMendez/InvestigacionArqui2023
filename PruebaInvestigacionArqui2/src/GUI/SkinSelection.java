@@ -41,16 +41,13 @@ public class SkinSelection extends JFrame{
     }
     
     public SkinSelection(){
+        
         setSize(810, 638);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLayout(null);
         arduino = new  PanamaHitek_Arduino();
-         try {
-            setupArduino();
-        } catch (ArduinoException | InterruptedException | SerialPortException ex) {
-            Logger.getLogger(GameWindow.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        setupArduino();
         init();
     }
 
@@ -106,8 +103,12 @@ public class SkinSelection extends JFrame{
                 System.out.println("NUMERO: "+this.Skin);
     }
 
-    private void setupArduino() throws ArduinoException, InterruptedException, SerialPortException { // CONFIGURACION DEL ARDUINO
-        arduino.arduinoRX("COM3", 9600, createSerialPortListener());
+    private void setupArduino()  { // CONFIGURACION DEL ARDUINO
+      try{
+          arduino.arduinoRX("COM3", 9600, createSerialPortListener());
+      }catch(Exception e){
+//          System.out.println("ERROR");
+      }
         //Thread.sleep(2000);// ESPERA A QUE EL PUERTO ESTE LISTO PARA ENVIAR Y RECIBIR DATOS
     }
     

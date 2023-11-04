@@ -4,9 +4,6 @@
  */
 package Domain;
 
-import java.awt.Rectangle;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.Timer;
@@ -15,18 +12,16 @@ import javax.swing.Timer;
  *
  * @author jodas
  */
-public class Unit {
-    private JLabel label;
+public class Enemy {
+     private JLabel label;
     private String unitName;
     private int type;
     private ImageIcon image;
     private Timer collisionTimer;
 
-    public Unit() {
-         
+    public Enemy() {
+        
     }
-
-    
 
     public Timer getCollisionTimer() {
         return collisionTimer;
@@ -44,14 +39,14 @@ public class Unit {
         this.image = image;
     }
 
-    public Unit(JLabel label, String unitName, int type, ImageIcon image) {
+    public Enemy(JLabel label, String unitName, int type, ImageIcon image) {
         this.label = label;
         this.unitName = unitName;
         this.type = type;
         this.image = image;
     }
 
-    public Unit(JLabel label, String unitName, int type) {
+    public Enemy(JLabel label, String unitName, int type) {
         this.label = label;
         this.unitName = unitName;
         this.type = type;
