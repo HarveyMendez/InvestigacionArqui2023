@@ -35,8 +35,7 @@ public class FinalMessage extends JFrame {
                 SwingUtilities.invokeLater(new Runnable() {
                     @Override
                     public void run() {
-                        dispose(); // Cierra la ventana actual
-                        // Código para abrir la nueva ventana aquí
+                        dispose();
                         MainWindow mw = new MainWindow();
                         mw.setVisible(true);
                     }
@@ -49,9 +48,11 @@ public class FinalMessage extends JFrame {
 
     public void init() {// DEPENDIENDO DEL TIPO DE MENSAJE QUE RECIBA VA A MOSTRAR UN MENSAJE EN UNA VENTANA EMERGENTE
         ImageIcon img;
+        System.out.println("numero: "+messageType);
         switch (messageType) {
             case 1:// VICTORIA
-                img = new ImageIcon(getClass().getResource("/img/HUD/victory.png"));
+                System.out.println("ENTREEEEEE");
+                img = new ImageIcon(getClass().getResource("/img/HUD/Victory.png"));
                 break;
             case 2:// DERROTA
                 img = new ImageIcon(getClass().getResource("/img/HUD/defeat.png"));

@@ -55,6 +55,7 @@ public class Game {
     public int stop;
     Timer timer;
     DamageMessage dmgMessage;
+    FinalMessage msj;
 // ---------------------------------------------------------------------------------
     
     public int getSelection() {
@@ -164,14 +165,14 @@ public class Game {
             }
             if (tower1 == 0) {// SI LLEGA A 0 LA TORRE
                 try {
-                    dmgMessage = new DamageMessage(2);
-                    dmgMessage.setVisible(true);
+//                    dmgMessage = new DamageMessage(2);
+//                    dmgMessage.setVisible(true);
                     arduino.sendData("8");// APAGAR LED ARDUINO
                     finish = 1;// SE TERMINA EL JUEGO, DERROTA
 
-                    FinalMessage msj = new FinalMessage(2);
+                    msj = new FinalMessage(2);
                     msj.setVisible(true);
-                    return;// NO SIGUE EJECUTANDO NADA MAS
+//                    return;// NO SIGUE EJECUTANDO NADA MAS
 
                 } catch (ArduinoException ex) {
                     Logger.getLogger(Game.class.getName()).log(Level.SEVERE, null, ex);
@@ -194,14 +195,13 @@ public class Game {
             }
             if (tower2 == 0) {// SI LLEGA A 0 LA TORRE
                 try {
-                    dmgMessage = new DamageMessage(1);
-                    dmgMessage.setVisible(true);
+//                    dmgMessage = new DamageMessage(1);
+//                    dmgMessage.setVisible(true);
                     arduino.sendData("6");// APAGAR LED ARDUINO
                     finish = 1;// SE TERMINA EL JUEGO, VICTORIA
-
-                    FinalMessage msj = new FinalMessage(1);
+                    msj = new FinalMessage(1);
                     msj.setVisible(true);
-                    return;// NO EJECUTA NADA MAS
+//                    return;// NO EJECUTA NADA MAS
 
                 } catch (ArduinoException | SerialPortException ex) {
                     Logger.getLogger(Game.class.getName()).log(Level.SEVERE, null, ex);
