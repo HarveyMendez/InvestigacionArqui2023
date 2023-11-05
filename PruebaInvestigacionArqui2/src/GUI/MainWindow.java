@@ -6,6 +6,8 @@ package GUI;
 
 import com.panamahitek.ArduinoException;
 import com.panamahitek.PanamaHitek_Arduino;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -13,6 +15,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.SwingUtilities;
+import javax.swing.Timer;
 import jssc.SerialPortEvent;
 import jssc.SerialPortEventListener;
 import jssc.SerialPortException;
@@ -21,78 +24,80 @@ import jssc.SerialPortException;
  *
  * @author diego
  */
-public class MainWindow extends JFrame{
-    
+public class MainWindow extends JFrame {
+// VARIABLES GLOBALES
+
     public PanamaHitek_Arduino arduino;
-    String messageArduino="";
-    
-    public MainWindow(){
+    String messageArduino = "";
+
+    public MainWindow() {// CONSTRUCTOR
         setSize(810, 638);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLayout(null);
-        arduino = new  PanamaHitek_Arduino();
-         try {
+        arduino = new PanamaHitek_Arduino();
+        try {
             setupArduino();
         } catch (ArduinoException | InterruptedException | SerialPortException ex) {
             Logger.getLogger(GameWindow.class.getName()).log(Level.SEVERE, null, ex);
         }
         init();
-        
-        
-        
+
     }
 
-    public void init(){
+    public void init() {
         ImageIcon img = new ImageIcon(getClass().getResource("/img/HUD/menu.png"));
         JLabel jblStart = new JLabel(img);
-        jblStart.setBounds(0, 0, img.getIconWidth(),img.getIconHeight() );
+        jblStart.setBounds(0, 0, img.getIconWidth(), img.getIconHeight());
         jblStart.setVisible(true);
-        
-        this.add(jblStart); 
-    }
-    
-    
 
-            
-            private void handleArduinoEvent(String messageArduino) throws ArduinoException {// EN ESTE METODO SE EJECUTAN LAS ACCIONES SEGUN EL BOTON DE LA PROTOBOARD QUE SE PRESIONE
-                                                            // CABE RESALTAR QUE CADA ACCION ESTA DIVIDIDA EN SUS RESPECTIVOS METODOS PARA SU CLARIDAD
+        this.add(jblStart);
+    }
+
+    private void handleArduinoEvent(String messageArduino) throws ArduinoException {// EN ESTE METODO SE EJECUTAN LAS ACCIONES SEGUN EL BOTON DE LA PROTOBOARD QUE SE PRESIONE
+        // CABE RESALTAR QUE CADA ACCION ESTA DIVIDIDA EN SUS RESPECTIVOS METODOS PARA SU CLARIDAD
         switch (messageArduino) {
-            case "Boton DERECHA presionado":
-                System.out.println("HOW TO PLAY");
+            case "Boton DERECHA presionado":// COMO JUGAR/TUTORIAL
                 arduino.killArduinoConnection();
                 Tutorial tutorial = new Tutorial();
                 tutorial.setVisible(true);
-                this.setVisible(false);
-            break;
-            case "Boton ABAJO presionado":
-                System.out.println("CHOOSE SKIN");
+                this.dispose();
+                break;
+            case "Boton ABAJO presionado":// ELEGIR SKIN/ASPECTO
                 arduino.killArduinoConnection();
                 SkinSelection skin = new SkinSelection();
                 skin.setVisible(true);
-                this.setVisible(false);
-            break;
-            case "Boton IZQUIERDA presionado":
-                System.exit(0);
-            break;
-            case "Boton PAUSA presionado":
-                arduino.killArduinoConnection();
+                this.dispose();
+                break;
+            case "Boton IZQUIERDA presionado":// SALIR DEL JUEGO
+                this.dispose();
+                DamageMessage msg = new DamageMessage(3);
+                msg.setVisible(true);
+                Timer timer = new Timer(2000, new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        System.exit(0);
+                    }
+                });
+                timer.setRepeats(false); // Se ejecuta solo una vez
+                timer.start();
+                break;
+            case "Boton PAUSA presionado":// INICIAR JUEGO
+                arduino.killArduinoConnection();// PRIMERO HAY QUE ELIMINAR LA CONEXION, DEBIDO A QUE UTILIZAREMOS OTRA PARA LA VENTANA QUE VAMOS A ABRIR
                 GameWindow gw = new GameWindow();
                 gw.setVisible(true);
-                this.setVisible(false);
-            break;
+                this.dispose();
+                break;
         }
 
     }
 
     private void setupArduino() throws ArduinoException, InterruptedException, SerialPortException { // CONFIGURACION DEL ARDUINO
-        arduino.arduinoRX("COM3", 9600, createSerialPortListener());
-//        Thread.sleep(2000);// ESPERA A QUE EL PUERTO ESTE LISTO PARA ENVIAR Y RECIBIR DATOS
+        arduino.arduinoRXTX("COM3", 9600, createSerialPortListener());// RECIBE Y ENVIA SEÑALES
     }
-    
-    
-                private SerialPortEventListener createSerialPortListener() {// ESTE ES UN METODO QUE UTILIZAMOS PARA QUE EL PROGRAMA ESCUCHE SI SE PRESIONA UN BOTON DESDE LA PROTOBOARD
-            //                                     Y DE ESTA MANERA EJECUTA EL CODIGO DEL ARDUINO PARA QUE LUEGO EL PROGRAMA SEPA QUE ACCION DEBE REALIZAR O SI ESTE DEBE ENCENDER O APAGAR EL LED
+
+    private SerialPortEventListener createSerialPortListener() {// ESTE ES UN METODO QUE UTILIZAMOS PARA QUE EL PROGRAMA ESCUCHE SI SE PRESIONA UN BOTON DESDE LA PROTOBOARD
+        //                                     Y DE ESTA MANERA EJECUTA EL CODIGO DEL ARDUINO PARA QUE LUEGO EL PROGRAMA SEPA QUE ACCION DEBE REALIZAR O SI ESTE DEBE ENCENDER O APAGAR EL LED
         return new SerialPortEventListener() {
             @Override
             public void serialEvent(SerialPortEvent serialPortEvent) {
@@ -108,7 +113,6 @@ public class MainWindow extends JFrame{
                                     Logger.getLogger(GameWindow.class.getName()).log(Level.SEVERE, null, ex);
                                 }
 
-                                
                             }
                         });
                     }
@@ -118,12 +122,5 @@ public class MainWindow extends JFrame{
             }
         };
     }
-            
-} 
 
-
-    
-
-    
-    
-
+}

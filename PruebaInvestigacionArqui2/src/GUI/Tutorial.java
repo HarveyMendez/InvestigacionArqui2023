@@ -21,64 +21,57 @@ import jssc.SerialPortException;
  * @author jodas
  */
 public class Tutorial extends JFrame {
+//------------------- VARIABLES GLOBALES ------------------------
     public PanamaHitek_Arduino arduino;
-    String messageArduino="";
-    
-    
-    public Tutorial(){
+    String messageArduino = "";
+
+    public Tutorial() {// CONSTRUCTOR
         setSize(810, 638);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLayout(null);
-        arduino = new  PanamaHitek_Arduino();
-         try {
+        arduino = new PanamaHitek_Arduino();
+        try {
             setupArduino();
         } catch (ArduinoException | InterruptedException | SerialPortException ex) {
             Logger.getLogger(GameWindow.class.getName()).log(Level.SEVERE, null, ex);
         }
         init();
-        
-        
-        
+
     }
 
-    public void init(){
-        ImageIcon img = new ImageIcon(getClass().getResource("/img/HUD/tutorial.png"));
+    public void init() {// INICIALIZAR COMPONENTES
+        ImageIcon img = new ImageIcon(getClass().getResource("/img/HUD/tutorial.png"));// SET HUD IMAGE
         JLabel jblStart = new JLabel(img);
-        jblStart.setBounds(0, 0, img.getIconWidth(),img.getIconHeight() );
+        jblStart.setBounds(0, 0, img.getIconWidth(), img.getIconHeight());
         jblStart.setVisible(true);
-        
-        this.add(jblStart); 
-    }
-    
-    
 
-            
-            private void handleArduinoEvent(String messageArduino) throws ArduinoException {// EN ESTE METODO SE EJECUTAN LAS ACCIONES SEGUN EL BOTON DE LA PROTOBOARD QUE SE PRESIONE
-                                                            // CABE RESALTAR QUE CADA ACCION ESTA DIVIDIDA EN SUS RESPECTIVOS METODOS PARA SU CLARIDAD
+        this.add(jblStart);
+    }
+
+    private void handleArduinoEvent(String messageArduino) throws ArduinoException {// EN ESTE METODO SE EJECUTAN LAS ACCIONES SEGUN EL BOTON DE LA PROTOBOARD QUE SE PRESIONE
+        // CABE RESALTAR QUE CADA ACCION ESTA DIVIDIDA EN SUS RESPECTIVOS METODOS PARA SU CLARIDAD
         switch (messageArduino) {
             case "Boton IZQUIERDA presionado":
-                arduino.killArduinoConnection();
+                arduino.killArduinoConnection();// SE ELIMINA LA CONEXION ANTERIOR DEL ARDUINO PARA EVITAR QUE SE SOLAPEN AMBAS CONEXIONES
                 MainWindow mw = new MainWindow();
                 mw.setVisible(true);
                 this.setVisible(false);
-            break;
+                break;
         }
     }
 
     private void setupArduino() throws ArduinoException, InterruptedException, SerialPortException { // CONFIGURACION DEL ARDUINO
-        arduino.arduinoRX("COM3", 9600, createSerialPortListener());
-        //Thread.sleep(2000);// ESPERA A QUE EL PUERTO ESTE LISTO PARA ENVIAR Y RECIBIR DATOS
+        arduino.arduinoRX("COM3", 9600, createSerialPortListener());// SOLO ENVIA SEÑALES
     }
-    
-    
-                private SerialPortEventListener createSerialPortListener() {// ESTE ES UN METODO QUE UTILIZAMOS PARA QUE EL PROGRAMA ESCUCHE SI SE PRESIONA UN BOTON DESDE LA PROTOBOARD
-            //                                     Y DE ESTA MANERA EJECUTA EL CODIGO DEL ARDUINO PARA QUE LUEGO EL PROGRAMA SEPA QUE ACCION DEBE REALIZAR O SI ESTE DEBE ENCENDER O APAGAR EL LED
+
+    private SerialPortEventListener createSerialPortListener() {// ESTE ES UN METODO QUE UTILIZAMOS PARA QUE EL PROGRAMA ESCUCHE SI SE PRESIONA UN BOTON DESDE LA PROTOBOARD
+        //                                     Y DE ESTA MANERA EJECUTA EL CODIGO DEL ARDUINO PARA QUE LUEGO EL PROGRAMA SEPA QUE ACCION DEBE REALIZAR O SI ESTE DEBE ENCENDER O APAGAR EL LED
         return new SerialPortEventListener() {
             @Override
             public void serialEvent(SerialPortEvent serialPortEvent) {
                 try {
-                    if (arduino.isMessageAvailable()) {
+                    if (arduino.isMessageAvailable()) {// VERIFICA QUE HAYA UN MENSAJE QUE RECIBIR
                         SwingUtilities.invokeLater(new Runnable() {
                             @Override
                             public void run() {
@@ -89,7 +82,6 @@ public class Tutorial extends JFrame {
                                     Logger.getLogger(GameWindow.class.getName()).log(Level.SEVERE, null, ex);
                                 }
 
-                                
                             }
                         });
                     }
@@ -99,8 +91,5 @@ public class Tutorial extends JFrame {
             }
         };
     }
-            
-} 
 
-    
-    
+}

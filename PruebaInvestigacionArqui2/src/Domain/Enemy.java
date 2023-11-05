@@ -13,16 +13,18 @@ import javax.swing.Timer;
  * @author jodas
  */
 public class Enemy {
-     private JLabel label;
+    // ATRIBUTOS DE LA CLASE
+    private JLabel label;
     private String unitName;
     private int type;
     private ImageIcon image;
     private Timer collisionTimer;
 
-    public Enemy() {
-        
-    }
+    public Enemy() {// CONSTRUCTOR VACIO
 
+    }
+    
+    // GETTERS Y SETTERS
     public Timer getCollisionTimer() {
         return collisionTimer;
     }
@@ -75,7 +77,5 @@ public class Enemy {
     public void setType(int type) {
         this.type = type;
     }
-    
-    
-    
+
 }

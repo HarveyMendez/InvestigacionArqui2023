@@ -4,7 +4,6 @@
  */
 package Main;
 
-import GUI.GameWindow;
 import GUI.MainWindow;
 
 /**
@@ -17,10 +16,8 @@ public class PruebaInvestigacionArqui2 {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        //GameWindow gw = new GameWindow();
         MainWindow mw = new MainWindow();
-        //gw.setVisible(true);
         mw.setVisible(true);
     }
-    
+
 }

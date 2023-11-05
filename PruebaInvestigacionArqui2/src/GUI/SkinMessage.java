@@ -16,11 +16,11 @@ import javax.swing.Timer;
  *
  * @author jodas
  */
-public class FinalMessage extends JFrame {
-
+public class SkinMessage extends JFrame {
+// VARIABLES GLOBALES
     private int messageType;
 
-    public FinalMessage(int messageType) {
+    public SkinMessage(int messageType) {// CONSTRUCTOR
         this.messageType = messageType;
         setSize(600, 200);
         setLocationRelativeTo(null);
@@ -29,35 +29,37 @@ public class FinalMessage extends JFrame {
         init();
 
         
-        Timer timer = new Timer(5000, new ActionListener() {// ESPERA 5s ANTES DE CERRAR LA VENTANA, PARA DAR TIEMPO A QUE LA DESCONEXION CON EL ARDUINO SE EFECTUE
+        Timer timer = new Timer(5000, new ActionListener() {// ESPERAR 5s PARA CERRAR LA VENTANA Y CERRAR CORRECTAMENTE LA CONEXION CON EL ARDUINO
             @Override
             public void actionPerformed(ActionEvent e) {
                 SwingUtilities.invokeLater(new Runnable() {
                     @Override
                     public void run() {
-                        dispose(); // Cierra la ventana actual
-                        // Código para abrir la nueva ventana aquí
+                        dispose();
                         MainWindow mw = new MainWindow();
                         mw.setVisible(true);
                     }
                 });
             }
         });
-        timer.setRepeats(false); // Se ejecuta solo una vez
+        timer.setRepeats(false);
         timer.start();
     }
 
-    public void init() {// DEPENDIENDO DEL TIPO DE MENSAJE QUE RECIBA VA A MOSTRAR UN MENSAJE EN UNA VENTANA EMERGENTE
+    public void init() {// DEPENDIENDO DE EL MENSAJE QUE RECIBA UTILIZARA UNA MENSAJE COMO VENTANA EMERGENTE U OTRO
         ImageIcon img;
         switch (messageType) {
-            case 1:// VICTORIA
-                img = new ImageIcon(getClass().getResource("/img/HUD/victory.png"));
+            case 1:
+                img = new ImageIcon(getClass().getResource("/img/HUD/skin1.png"));
                 break;
-            case 2:// DERROTA
-                img = new ImageIcon(getClass().getResource("/img/HUD/defeat.png"));
+            case 2:
+                img = new ImageIcon(getClass().getResource("/img/HUD/skin2.png"));
                 break;
-            default:// VOLVER AL MENU PRINCIPAL
-                img = new ImageIcon(getClass().getResource("/img/HUD/default.png"));
+            case 3:
+                img = new ImageIcon(getClass().getResource("/img/HUD/skin3.png"));
+                break;
+            default:
+                img = new ImageIcon(getClass().getResource("/img/HUD/skin3.png"));
                 break;
         }
 
