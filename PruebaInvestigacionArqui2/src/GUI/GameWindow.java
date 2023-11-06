@@ -62,7 +62,7 @@ public class GameWindow extends javax.swing.JPanel implements KeyListener{
     public int skin;
     
 
-    public GameWindow(JFrame container, int skin) { // INICIALIZA LA VENTANA
+    public GameWindow(JFrame container, int skin) throws ArduinoException { // INICIALIZA LA VENTANA
         this.skin = skin;
         this.container = container;
         setSize(815, 745);
@@ -72,12 +72,14 @@ public class GameWindow extends javax.swing.JPanel implements KeyListener{
         this.setFocusable(true);
         this.skin = skin;
         arduino = new PanamaHitek_Arduino();
+        
+        
         //CONFIGURAR ARDUINO
-//        try {
-//            setupArduino();
-//        } catch (ArduinoException | InterruptedException | SerialPortException ex) {
-//            Logger.getLogger(GameWindow.class.getName()).log(Level.SEVERE, null, ex);
-//        }
+        try {
+            setupArduino();
+        } catch (ArduinoException | InterruptedException | SerialPortException ex) {
+            Logger.getLogger(GameWindow.class.getName()).log(Level.SEVERE, null, ex);
+        }
         
 
         game = new Game(2, 2, this.skin, this.arduino);

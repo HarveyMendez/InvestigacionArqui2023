@@ -104,7 +104,8 @@ public class Tutorial extends JFrame implements KeyListener{
     @Override
     public void keyPressed(KeyEvent e) {
         if (KeyEvent.getKeyText(e.getKeyCode()).equals("A")) {
-
+            mw.setVisible(true);
+            this.dispose();
         }
     }
 
