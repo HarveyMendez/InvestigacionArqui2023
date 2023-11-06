@@ -7,7 +7,6 @@ package Domain;
 import java.awt.Graphics;
 import java.awt.Image;
 import javax.swing.ImageIcon;
-import javax.swing.JLabel;
 
 /**
  *
@@ -19,17 +18,14 @@ public class Map {
 
     public Map(int skin) {
         if (skin == 1) {
-            System.out.println("skin 1");
             ImageIcon icon = new ImageIcon(getClass().getResource("/img/HUD/HUD1/Map1.png"));
             this.image = icon.getImage();
         }
         if (skin == 2) {
-            System.out.println("skin 2");
             ImageIcon icon = new ImageIcon(getClass().getResource("/img/HUD/HUD2/Map1.png"));
             this.image = icon.getImage();
         }
         if (skin == 3) {
-            System.out.println("skin 3");
             ImageIcon icon = new ImageIcon(getClass().getResource("/img/HUD/HUD3/Map1.png"));
             this.image = icon.getImage();
         }

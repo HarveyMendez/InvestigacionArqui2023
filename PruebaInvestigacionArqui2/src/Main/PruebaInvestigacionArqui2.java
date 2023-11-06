@@ -4,9 +4,7 @@
  */
 package Main;
 
-import GUI.GameWindow;
 import GUI.MainWindow;
-import javax.swing.JFrame;
 
 /**
  *
@@ -18,14 +16,6 @@ public class PruebaInvestigacionArqui2 {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        
-//        JFrame frame = new JFrame("Mi Juego");
-//        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-//        frame.setSize(815, 745);
-//        frame.setLocationRelativeTo(null);
-//        frame.setLayout(null);
-//        frame.add(new GameWindow()); 
-//        frame.setVisible(true);
 
         MainWindow mw = new MainWindow(1);
         mw.setVisible(true);
