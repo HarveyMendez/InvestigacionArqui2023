@@ -24,24 +24,58 @@ public class Unit {
     private final int type;
     private final int line;
 
-    public Unit(int x, int y, int type, int line) {
+    public Unit(int x, int y, int type, int line, int skin) {
         this.x = x;
         this.y = y;
         this.type = type;
         this.line = line;
-        
-        if(this. type == 1) {
-            ImageIcon icon = new ImageIcon(getClass().getResource("/img/UNITS/UNITS1/knightGame.png"));
-            this.image = icon.getImage();
+
+        if (this.type == 1) {
+            if (skin == 1) {
+                ImageIcon icon = new ImageIcon(getClass().getResource("/img/UNITS/UNITS1/knightGame.png"));
+                this.image = icon.getImage();
+            }
+            if (skin == 2) {
+                ImageIcon icon = new ImageIcon(getClass().getResource("/img/UNITS/UNITS2/knightGame.png"));
+                this.image = icon.getImage();
+            }
+            if (skin == 3) {
+                ImageIcon icon = new ImageIcon(getClass().getResource("/img/UNITS/UNITS3/knightGame.png"));
+                this.image = icon.getImage();
+            }
+
         }
-        if(this.type == 2) {
-            ImageIcon icon = new ImageIcon(getClass().getResource("/img/UNITS/UNITS1/crossbowGame.png"));
-            this.image = icon.getImage();
-        }if(this.type == 3) {
-            ImageIcon icon = new ImageIcon(getClass().getResource("/img/UNITS/UNITS1/horseGame.png"));
-            this.image = icon.getImage();
+        if (this.type == 2) {
+            if (skin == 1) {
+                ImageIcon icon = new ImageIcon(getClass().getResource("/img/UNITS/UNITS1/crossbowGame.png"));
+                this.image = icon.getImage();
+            }
+            if (skin == 2) {
+                ImageIcon icon = new ImageIcon(getClass().getResource("/img/UNITS/UNITS2/crossbowGame.png"));
+                this.image = icon.getImage();
+            }
+            if (skin == 3) {
+                ImageIcon icon = new ImageIcon(getClass().getResource("/img/UNITS/UNITS3/crossbowGame.png"));
+                this.image = icon.getImage();
+            }
+
         }
-        
+        if (this.type == 3) {
+            if (skin == 1) {
+                ImageIcon icon = new ImageIcon(getClass().getResource("/img/UNITS/UNITS1/horseGame.png"));
+                this.image = icon.getImage();
+            }
+            if (skin == 2) {
+                ImageIcon icon = new ImageIcon(getClass().getResource("/img/UNITS/UNITS2/horseGame.png"));
+                this.image = icon.getImage();
+            }
+            if (skin == 3) {
+                ImageIcon icon = new ImageIcon(getClass().getResource("/img/UNITS/UNITS3/horseGame.png"));
+                this.image = icon.getImage();
+            }
+
+        }
+
     }
 
     public void move() {
@@ -81,8 +115,8 @@ public class Unit {
 
             if (posX > 10) {
                 posX--;
-            } else if (posY > 540 && posX == 10) {
-                posY--;
+            } else if (posY < 540 && posX == 10) {
+                posY++;
             }
 
             this.x = posX;
@@ -108,13 +142,7 @@ public class Unit {
     }
 
     public boolean collision(Unit otherUnit) {
-        return x < otherUnit.x + 50
-                && x + 50 > otherUnit.x
-                && y < otherUnit.y + 50
-                && y + 50 > otherUnit.y;
-        
-        
-        
+        return x < otherUnit.x + 50 && x + 50 > otherUnit.x && y < otherUnit.y + 50 && y + 50 > otherUnit.y; 
     }
 
     public void draw(Graphics g) {

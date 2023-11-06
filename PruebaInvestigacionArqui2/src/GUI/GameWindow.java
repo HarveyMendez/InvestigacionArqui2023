@@ -5,25 +5,26 @@
 package GUI;
 
 import Domain.Game;
-import Domain.Unit;
 import com.panamahitek.ArduinoException;
 import com.panamahitek.PanamaHitek_Arduino;
+import java.awt.Color;
+import java.awt.Font;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.awt.Graphics;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.util.ArrayList;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.ImageIcon;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.SwingUtilities;
-import javax.swing.Timer;
 import jssc.SerialPortEvent;
 import jssc.SerialPortEventListener;
 import jssc.SerialPortException;
+
 /**
  *
  * @author diego
@@ -35,122 +36,200 @@ public class GameWindow extends javax.swing.JPanel implements KeyListener{
     String messageArduino="";
     Game game;
     
-    public ArrayList<Unit> unitList = new ArrayList<>();
-    public ArrayList<Unit> enemyUnitList = new ArrayList<>();
+    public int cdKnight = 1;
+    public JLabel jlbCdKnight;
+    
+    public int cdCrossbow = 1;
+    public JLabel jlbCdCrossbow;
+    
+    public int cdHorse = 1;
+    public JLabel jlbCdHorse;
+    
+    public  ImageIcon imgSelection;
+    public JLabel selection;
+    public JLabel knight;
+    public JLabel horse;
+    public JLabel crossBow;
 
-    public  ImageIcon imgSelection = new ImageIcon(getClass().getResource("/img/HUD/HUD1/Selection.png"));
-    public  JLabel selection = new JLabel(imgSelection);
     
     
-    ////////////////////////////////////////////////////// AQUI INICIA EL CODIGO LIMPIO /////////////////////////////////////////////////////////////
-    public GameWindow() { // INICIALIZA LA VENTANA
+    public ImageIcon imgKnight;
+    public ImageIcon imgHorse;
+    public ImageIcon imgCrossBow;
+    public ImageIcon imgHub;
+    
+    public JFrame container;
+    public int skin;
+    
+
+    public GameWindow(JFrame container, int skin) { // INICIALIZA LA VENTANA
+        this.skin = skin;
+        this.container = container;
+        setSize(815, 745);
+        setLayout(null);
+        
         this.addKeyListener(this);
         this.setFocusable(true);
-
-        game = new Game(2, 2);
-
+        this.skin = skin;
         arduino = new PanamaHitek_Arduino();
-
-        //TEMPORIZADOR UNICO Y GENERAL DEL JUEGO
-        Timer timer1 = new Timer(20, new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (!game.finish()) {
-                    if (!game.getPause()) {
-                        game.refresh2();
-                        repaint();
-
-                    }
-                }else { //juego terminado
-                    System.out.println("Juego terminado");
-                    
-                }
-
-
-            }
-        });
-        timer1.start();
-        
-        
-        //LOGICA IA
-        Random random = new Random();
-        Timer timer2 = new Timer(3500, new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                
-                int randomLine = random.nextInt(5 - 3) + 3;
-                game.addUnit(randomLine);
-                repaint();
-            }
-        });
-        timer2.start();
-        
-
-        initializeGameWindow();
-        //initComponents();
-    }
-    
-    private void init() {// INICIALIZA LOS COMPONENTES GRAFICOS
-        setupUIElements();
-    }
-    
-//    private void createAndAddUnits() {
-// 
-//    }
-
-    private void setupUIElements() { // EN ESTE METODO SE CREAN LOS ELEMENTOS GRAFICOS PARA MOSTRARLOS EN LA GUI
-        setLayout(null);
-
-        selection.setBounds(425 , 590, 100, 100);              
-        
-        JLabel fake = new JLabel();
-        fake.setBounds(170 , 590, 100, 100);
-        game.Selection(fake.getX(), messageArduino);
-        this.add(selection);
-
-        ImageIcon imgKnight = new ImageIcon(getClass().getResource("/img/UNITS/UNITS1/knightpeque.png"));
-        JLabel knight = new JLabel(imgKnight);
-        knight.setBounds(90, 600, 100, 100);
-        this.add(knight);
-        
-        ImageIcon imgHorse = new ImageIcon(getClass().getResource("/img/UNITS/UNITS1/horsepeque.png"));
-        JLabel horse = new JLabel(imgHorse);
-        horse.setBounds(350, 600, 100, 100);
-        this.add(horse);
-        
-        ImageIcon imgCrossBow = new ImageIcon(getClass().getResource("/img/UNITS/UNITS1/crossbowpeque.png"));
-        JLabel crossBow = new JLabel(imgCrossBow);
-        crossBow.setBounds(610, 600, 100, 100);
-        this.add(crossBow);
-        
-        // --------------------------------------------------- MAPA Y HUD ----------------------------
-        ImageIcon imgHub = new ImageIcon(getClass().getResource("/img/HUD/HUD1/Hud1.png"));
-        JLabel hub = new JLabel(imgHub);
-        hub.setBounds(0,590, 800, 120);
-        this.add(hub);
-        
-        
-//        ImageIcon imgMap = new ImageIcon(getClass().getResource("/img/HUD/HUD1/Map1.png"));
-//        JLabel map = new JLabel(imgMap);
-//        map.setBounds(0, 0, 800, 600);
-//        this.add(map); 
-        // -----------------------------------------------------------------------------------------------------------
-    }
-    
-    private void initializeGameWindow() { // SE CONFIGURA LA VENTANA Y SE CREAN LOS OBJETOS NECESARIOS PARA EL FUNCIONAMIENTO DEL ARDUINO
-        setSize(815, 745);
-//        setLocationRelativeTo(null);
-//        setDefaultCloseOperation(EXIT_ON_CLOSE);
-        setLayout(null);
-
-        
-        
+        //CONFIGURAR ARDUINO
 //        try {
 //            setupArduino();
 //        } catch (ArduinoException | InterruptedException | SerialPortException ex) {
 //            Logger.getLogger(GameWindow.class.getName()).log(Level.SEVERE, null, ex);
-//        }          
+//        }
+        
+
+        game = new Game(2, 2, this.skin, this.arduino);
         init();
+        initTimers();
+
+
+
+    }
+    
+    private void init() {// INICIALIZA LOS COMPONENTES GRAFICOS
+        
+        
+        if (skin == 1) {
+            imgSelection = new ImageIcon(getClass().getResource("/img/HUD/HUD1/Selection.png"));
+            imgKnight = new ImageIcon(getClass().getResource("/img/UNITS/UNITS1/knightpeque.png"));
+            imgHorse = new ImageIcon(getClass().getResource("/img/UNITS/UNITS1/horsepeque.png"));
+            imgCrossBow = new ImageIcon(getClass().getResource("/img/UNITS/UNITS1/crossbowpeque.png"));
+            imgHub = new ImageIcon(getClass().getResource("/img/HUD/HUD1/Hud1.png"));
+        }
+        if (skin == 2) {
+            imgSelection = new ImageIcon(getClass().getResource("/img/HUD/HUD2/Selection.png"));
+            imgKnight = new ImageIcon(getClass().getResource("/img/UNITS/UNITS2/knightpeque.png"));
+            imgHorse = new ImageIcon(getClass().getResource("/img/UNITS/UNITS2/horsepeque.png"));
+            imgCrossBow = new ImageIcon(getClass().getResource("/img/UNITS/UNITS2/crossbowpeque.png"));
+            imgHub = new ImageIcon(getClass().getResource("/img/HUD/HUD2/Hud1.png"));
+        }
+        if (skin == 3) {
+            imgSelection = new ImageIcon(getClass().getResource("/img/HUD/HUD3/Selection.png"));
+            imgKnight = new ImageIcon(getClass().getResource("/img/UNITS/UNITS3/knightpeque.png"));
+            imgHorse = new ImageIcon(getClass().getResource("/img/UNITS/UNITS3/horsepeque.png"));
+            imgCrossBow = new ImageIcon(getClass().getResource("/img/UNITS/UNITS3/crossbowpeque.png"));
+            imgHub = new ImageIcon(getClass().getResource("/img/HUD/HUD3/Hud1.png"));
+        }
+
+        selection = new JLabel(imgSelection);
+        selection.setBounds(425, 590, 100, 100);
+        this.add(selection);
+
+        knight = new JLabel(imgKnight);
+        knight.setBounds(90, 600, 100, 100);
+        this.add(knight);
+
+        horse = new JLabel(imgHorse);
+        horse.setBounds(350, 600, 100, 100);
+        this.add(horse);
+
+        crossBow = new JLabel(imgCrossBow);
+        crossBow.setBounds(610, 600, 100, 100);
+        this.add(crossBow);
+
+
+        
+        
+        //JLABELS TIMERS
+        this.jlbCdKnight = new JLabel();
+        this.jlbCdKnight.setBounds(110, 600, 100, 100);
+        jlbCdKnight.setFont(jlbCdKnight.getFont().deriveFont(Font.BOLD, 50f));
+        jlbCdKnight.setForeground(Color.WHITE);
+        this.add(this.jlbCdKnight);
+        this.jlbCdKnight.setVisible(true);
+
+        this.jlbCdHorse = new JLabel();
+        this.jlbCdHorse.setBounds(380, 600, 100, 100);
+        jlbCdHorse.setFont(jlbCdKnight.getFont().deriveFont(Font.BOLD, 50f));
+        jlbCdHorse.setForeground(Color.WHITE);
+        this.add(this.jlbCdHorse);
+        this.jlbCdHorse.setVisible(true);
+
+        this.jlbCdCrossbow = new JLabel();
+        this.jlbCdCrossbow.setBounds(650, 600, 100, 100);
+        jlbCdCrossbow.setFont(jlbCdKnight.getFont().deriveFont(Font.BOLD, 50f));
+        jlbCdCrossbow.setForeground(Color.WHITE);
+        this.add(this.jlbCdCrossbow);
+        this.jlbCdCrossbow.setVisible(true);
+
+        JLabel hub = new JLabel(imgHub);
+        hub.setBounds(0, 590, 800, 120);
+        this.add(hub);
+
+
+    }
+    
+    private void initTimers() {
+
+        //TEMPORIZADOR UNICO Y GENERAL DEL JUEGO
+        Timer timer1 = new Timer();
+        TimerTask tarea = new TimerTask() {
+            @Override
+            public void run() {
+                if (!game.finish()) {
+                    if (!game.getPause()) {
+                        game.refresh2();
+                        repaint();
+                    }
+                } else { //juego terminado
+                    timer1.cancel();
+                    closeGame(game.getGanador());
+                }
+            }
+        };
+        timer1.schedule(tarea, 0, 20);
+
+        //LOGICA IA
+        Random random = new Random();
+        Timer timer2 = new Timer();
+        TimerTask tarea2 = new TimerTask() {
+            @Override
+            public void run() {
+                if (!game.getPause()) {
+                    int randomLine = random.nextInt(5 - 3) + 3;
+                    game.addUnit(randomLine);
+                }
+
+            }
+        };
+        timer2.schedule(tarea2, 3500, 3500);
+
+        //TIMER PARA COOLDOWN
+        Timer cdUnits = new Timer();
+        TimerTask tareaCdUnits = new TimerTask() {
+            @Override
+            public void run() {
+                if (!game.getPause()) {
+                    if (cdKnight > 0) {
+                        cdKnight -= 1;
+                        jlbCdKnight.setText("" + cdKnight);
+                    } else {
+                        jlbCdKnight.setVisible(false);
+                        knight.setVisible(true);
+                    }
+                    if (cdCrossbow > 0) {
+                        cdCrossbow -= 1;
+                        jlbCdCrossbow.setText("" + cdCrossbow);
+                    } else {
+                        jlbCdCrossbow.setVisible(false);
+                        crossBow.setVisible(true);
+                    }
+                    if (cdHorse > 0) {
+                        cdHorse -= 1;
+                        jlbCdHorse.setText("" + cdHorse);
+                    } else {
+                        jlbCdHorse.setVisible(false);
+                        horse.setVisible(true);
+                    }
+                }
+
+
+            }
+        };
+        cdUnits.schedule(tareaCdUnits, 10, 1000);
+
     }
 
     private void setupArduino() throws ArduinoException, InterruptedException, SerialPortException { // CONFIGURACION DEL ARDUINO
@@ -165,41 +244,71 @@ public class GameWindow extends javax.swing.JPanel implements KeyListener{
     private void handleArduinoEvent(String messageArduino) {// EN ESTE METODO SE EJECUTAN LAS ACCIONES SEGUN EL BOTON DE LA PROTOBOARD QUE SE PRESIONE
         // CABE RESALTAR QUE CADA ACCION ESTA DIVIDIDA EN SUS RESPECTIVOS METODOS PARA SU CLARIDAD
 
-        
-        if(!game.getPause()){
-            
-        }
+
         switch (messageArduino) {
             case "Boton DERECHA presionado":
                 handleButtonRight();
                 break;
-//            case "Boton ARRIBA presionado":
-//                handleButtonUp();
-//            break;
-//            case "Boton ABAJO presionado":
-//                handleButtonDown();
-//            break;
+            case "Boton ARRIBA presionado":
+                handleButtonUp();
+            break;
+            case "Boton ABAJO presionado":
+                handleButtonDown();
+            break;
             case "Boton IZQUIERDA presionado":
                 handleButtonLeft();
                 break;
             case "Boton PAUSA presionado":
-                handlePauseButton();
+                togglePause();
                 break;
         }
 
     }
 
     private void handleButtonUp() {// METODO QUE REALIZA LO QUE SE NECESITA CUANDO SE PRESIONA EL BOTON HACIA ARRIBA
-        
-        game.addUnit(1);
-        repaint();
-        
+
+        if (game.getSelection() == 170 && this.cdKnight == 0) {
+            game.addUnit(1);
+            this.cdKnight = 10;
+            this.knight.setVisible(false);
+            this.jlbCdKnight.setVisible(true);
+        }
+        if (game.getSelection() == 425 && this.cdHorse == 0) {
+            game.addUnit(1);
+            this.cdHorse = 10;
+            this.horse.setVisible(false);
+            this.jlbCdHorse.setVisible(true);
+        }
+        if (game.getSelection() == 700 && this.cdCrossbow == 0) {
+            game.addUnit(1);
+            this.cdCrossbow = 10;
+            this.crossBow.setVisible(false);
+            this.jlbCdCrossbow.setVisible(true);
+        }
+
     }
 
     private void handleButtonDown() {
-        
-        game.addUnit(2);
-        repaint();
+
+        if (game.getSelection() == 170 && this.cdKnight == 0) {
+            game.addUnit(2);
+            this.cdKnight = 10;
+            this.knight.setVisible(false);
+            this.jlbCdKnight.setVisible(true);
+        }
+        if (game.getSelection() == 425 && this.cdHorse == 0) {
+            game.addUnit(2);
+            this.cdHorse = 10;
+            this.horse.setVisible(false);
+            this.jlbCdHorse.setVisible(true);
+        }
+        if (game.getSelection() == 700 && this.cdCrossbow == 0) {
+            game.addUnit(2);
+            this.cdCrossbow = 10;
+            this.crossBow.setVisible(false);
+            this.jlbCdCrossbow.setVisible(true);
+        }
+
         
     }
     
@@ -213,12 +322,15 @@ public class GameWindow extends javax.swing.JPanel implements KeyListener{
         selection.setBounds(position , 590, 100, 100);
     }
 
-    private void handlePauseButton() { // METODO QUE REALIZA LO QUE SE NECESITA CUANDO SE PRESIONA EL BOTON DE PAUSA
-        togglePause();
-    }
-    
     public void togglePause() {// METODO PARA MANEJAR LAS PAUSAS, SI SE PRESIONA 1 VEZ SE PAUSA, SI SE VUELVE A PRESIONAR EL JUEGO SE REANUDA
         game.pause();
+    }
+    
+    public void closeGame(int ganador) {
+        FinalMessage mw = new FinalMessage(ganador);
+        mw.setVisible(true);
+        this.container.dispose();
+        
     }
     
     @Override
@@ -239,23 +351,6 @@ public class GameWindow extends javax.swing.JPanel implements KeyListener{
 
         if (KeyEvent.getKeyText(e.getKeyCode()).equals("W")) {
             this.handleButtonUp();
-            
-//            cdKnight = 10;
-//            java.util.Timer timer = new java.util.Timer();
-//
-//            TimerTask tt = new TimerTask() {
-//                @Override
-//                public void run() {
-//                    if (cdKnight == -1) {
-//                        timer.cancel();
-//                    } else {
-//                        timerKnight.setText(Integer.toString(cdKnight));
-//                        cdKnight--;
-//                    }
-//
-//                }
-//            };
-//            timer.scheduleAtFixedRate(tt, 0, 1000);
 
         }
 
@@ -274,7 +369,7 @@ public class GameWindow extends javax.swing.JPanel implements KeyListener{
 
         
         if(KeyEvent.getKeyText(e.getKeyCode()).equals("Q")) {
-            this.handlePauseButton();
+            this.togglePause();
         }
         
         
@@ -287,9 +382,7 @@ public class GameWindow extends javax.swing.JPanel implements KeyListener{
     public void keyReleased(KeyEvent e) {
 //        System.out.println("Tecla presionada: " + KeyEvent.getKeyText(e.getKeyCode()));
     }
-    
-    
-    
+ 
     private SerialPortEventListener createSerialPortListener() {// ESTE ES UN METODO QUE UTILIZAMOS PARA QUE EL PROGRAMA ESCUCHE SI SE PRESIONA UN BOTON DESDE LA PROTOBOARD
         //                                     Y DE ESTA MANERA EJECUTA EL CODIGO DEL ARDUINO PARA QUE LUEGO EL PROGRAMA SEPA QUE ACCION DEBE REALIZAR O SI ESTE DEBE ENCENDER O APAGAR EL LED
         return new SerialPortEventListener() {

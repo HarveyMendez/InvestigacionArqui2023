@@ -3,11 +3,14 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package Domain;
+import com.panamahitek.ArduinoException;
+import com.panamahitek.PanamaHitek_Arduino;
 import java.awt.Graphics;
 import java.util.ArrayList;
 import java.util.Random;
-import javax.swing.ImageIcon;
-
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import jssc.SerialPortException;
 
 /**
  *
@@ -15,20 +18,26 @@ import javax.swing.ImageIcon;
  */
 public class Game{
     
+    public PanamaHitek_Arduino arduino;
+    
     private int tower1;
     private int tower2;
     public int finish = 0;
     public int Selection;
     public int pause = 0;
+    public int skin;
     
     private Map map;
     private ArrayList<Unit> units = new ArrayList<>();
     private ArrayList<Unit> enemyUnits = new ArrayList<>();
     
-    public Game(int tower1, int tower2) {
+    public Game(int tower1, int tower2, int skin, PanamaHitek_Arduino arduino) {
+        this.arduino = arduino;
         this.tower1 = tower1;
         this.tower2 = tower2;
-        map = new Map();
+        this.skin = skin;
+        map = new Map(this.skin);
+        
     }
     
     public void chargeMap(Graphics g) {
@@ -88,11 +97,19 @@ public class Game{
 
     public boolean checkCollision() {
 
+        for (Unit unit2 : enemyUnits) {
+            //CHOQUE CON TORRE ALIADA
+            if (unit2.getX() == 10 && unit2.getY() == 540) {
+                enemyUnits.remove(unit2);
+                towerDamage(1);
+                return true;
+            }
+        }
+
         for (Unit unit1 : units) {
 
             //CHOQUE CON TORRE ENEMIGA
             if (unit1.getX() == 745 && unit1.getY() == 10) {
-                System.out.println("Daño torre enemiga");
                 units.remove(unit1);
                 towerDamage(2);
                 return true;
@@ -110,8 +127,6 @@ public class Game{
 
                 if (unit1 != unit2 && unit1.collision(unit2)) {
 
-
-                    
                     //COQUE CON OTRA UNIDAD
                     int winner = this.encounterWinner(unit1.getType(), unit2.getType());
                     if (winner == 1) {
@@ -125,7 +140,7 @@ public class Game{
                     if (winner == -1) {
                         units.remove(unit1);
                     }
-                    
+
                     return true;
                 }
 
@@ -135,32 +150,62 @@ public class Game{
     }
 
     public int encounterWinner(int type1, int type2) {
-        
+
         if (type1 == type2) {
             return 0; // Empate
         }
-        if ((type1 == 1 && type2 == 3) ||
-            (type1 == 2 && type2 == 1) ||
-            (type1 == 3 && type2 == 2)) {
+        if ((type1 == 1 && type2 == 3)
+                || (type1 == 2 && type2 == 1)
+                || (type1 == 3 && type2 == 2)) {
             return 1; // Usuario gana
         }
         return -1; // Computadora gana
-        
+
     }
 
-    public void towerDamage(int numTower) {
-        
-        if(numTower == 1) {
-            this.tower1 -=1;
-            if(tower1 == 0) {
+    public void towerDamage(int numTower){
+
+        if (numTower == 1) {
+            this.tower1 -= 1;
+            try {
+                arduino.sendData("7");// APAGAR LED ARDUINO
+            } catch (ArduinoException ex) {
+                Logger.getLogger(Game.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (SerialPortException ex) {
+                Logger.getLogger(Game.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            if (tower1 == 0) {
+                try {
+                    arduino.sendData("8");// APAGAR LED ARDUINO
+                } catch (ArduinoException ex) {
+                    Logger.getLogger(Game.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (SerialPortException ex) {
+                    Logger.getLogger(Game.class.getName()).log(Level.SEVERE, null, ex);
+                }
                 this.finish = 1;
+                this.pause();
             }
         }
-        
-        if(numTower == 2) {
-            this.tower2 -=1;
-            if(tower2 == 0) {
+
+        if (numTower == 2) {
+            this.tower2 -= 1;
+            try {
+                arduino.sendData("5");// APAGAR LED ARDUINO
+            } catch (ArduinoException ex) {
+                Logger.getLogger(Game.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (SerialPortException ex) {
+                Logger.getLogger(Game.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            if (tower2 == 0) {
+                try {
+                    arduino.sendData("6");// APAGAR LED ARDUINO
+                } catch (ArduinoException ex) {
+                    Logger.getLogger(Game.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (SerialPortException ex) {
+                    Logger.getLogger(Game.class.getName()).log(Level.SEVERE, null, ex);
+                }
                 this.finish = 1;
+                this.pause();
             }
         }
         
@@ -178,6 +223,7 @@ public class Game{
         }
  
         if (this.checkCollision() == true) {
+            
         }
 
     }
@@ -197,21 +243,21 @@ public class Game{
         int randomType = random.nextInt(4 - 1) + 1;
 
         if (line == 2) {
-            Unit newUnit = new Unit(110, 540, UnitSelected(Selection), line);
+            Unit newUnit = new Unit(110, 540, UnitSelected(Selection), line, skin);
             units.add(newUnit);
         }
         if (line == 1) {
-            Unit newUnit = new Unit(10, 440, UnitSelected(Selection), line);
+            Unit newUnit = new Unit(10, 440, UnitSelected(Selection), line, skin);
             units.add(newUnit);
         }
         if (line == 3) {
 
-            Unit newUnit = new Unit(700, 10, randomType, line);
+            Unit newUnit = new Unit(700, 10, randomType, line, skin);
             enemyUnits.add(newUnit);
         }
 
         if (line == 4) {
-            Unit newUnit = new Unit(740, 60, randomType, line);
+            Unit newUnit = new Unit(740, 60, randomType, line, skin);
             enemyUnits.add(newUnit);
         }
 
@@ -230,11 +276,16 @@ public class Game{
     }
     
     public boolean finish(){
-        if(this.finish == 0){
-            return false;
-        }else {
-            return true;
+        return this.finish != 0;
+    }
+    
+    public int getGanador(){
+        if(this.tower1 == 0) {
+            return 2;
+        } else {
+            return 1;
         }
+            
     }
     
 }
